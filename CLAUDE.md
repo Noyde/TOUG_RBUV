@@ -60,6 +60,7 @@ TOUG_RBUV/
 ├── README.md                    # Documentation principale (FR)
 ├── LICENSE                      # Licence MIT
 ├── .gitignore                   # Exclusions git
+├── CLAUDE.md                    # Instructions pour Claude Code
 ├── docs/                        # Documentation technique
 │   ├── hardware.md              # Schémas de câblage matériel
 │   ├── pi-zero-setup.md         # Guide installation Raspberry Pi
@@ -72,6 +73,9 @@ TOUG_RBUV/
 │       └── aldes_tone/
 │           ├── __init__.py      # Définition composant Python
 │           └── aldes_tone.h     # Code C++ protocole 0x17
+├── tests/                       # Tests et validation
+│   ├── README.md                # Matrice de tests TOUG + RBUV
+│   └── results/                 # Résultats horodatés
 └── tools/                       # Scripts et services
     ├── pac_aldes_mqtt.py        # Script Python Modbus→MQTT
     └── pac_aldes.service        # Service systemd
@@ -261,7 +265,7 @@ Messages préfixés :
 1. **Consignes thermostats (R20-R25)** : READ-ONLY au niveau hardware. Pilotées par radio 868MHz.
 2. **Télécommande Aldes** : Doit être DÉBRANCHÉE pour utiliser l'ESP32. Collisions garanties sinon.
 3. **Écriture USB** : IMPOSSIBLE sur modèles 2018. Seul le bus RS485 accepte le protocole 0x17.
-4. **Registres TOUG 31100-31104** : Non implémentés sur firmware 3019.
+4. **Registres TOUG 31100-31104** : Ne fonctionnent sur **aucun modèle** T.One (confirmé par @djtef). Erreur dans la doc TOUG.
 
 ---
 
