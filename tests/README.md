@@ -155,12 +155,12 @@ sudo apt install python3-serial
 | W02 | 9 | 0x10 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W03 | 9 | 0x06 | RS485 | illegal function | ⬜ | |
 | W04 | 9 | 0x10 | RS485 | illegal data address | ⬜ | |
-| W05 | 20 | 0x06 | USB | illegal data address | ⬜ | |
-| W06 | 31100 | 0x06 | USB | illegal data address | ⬜ | |
-| W07 | 31101 | 0x06 | USB | illegal data address | ⬜ | |
-| W08 | 31102 | 0x06 | USB | illegal data address | ⬜ | |
-| W09 | 31103 | 0x06 | USB | illegal data address | ⬜ | |
-| W10 | 31104 | 0x06 | USB | illegal data address | ⬜ | |
+| W05 | 20 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+| W06 | 31100 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+| W07 | 31101 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+| W08 | 31102 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+| W09 | 31103 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+| W10 | 31104 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 
 ---
 
