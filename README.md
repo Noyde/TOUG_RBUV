@@ -115,21 +115,34 @@ Voir [esphome/README.md](esphome/README.md)
 
 | Fonctionnalité | Statut | Validé |
 |----------------|--------|--------|
-| Lecture registres (34) | 🔄 En cours | ⚠️ Partiellement |
-| Dashboard Home Assistant | 🔄 En cours | ⚠️ Partiellement |
+| Lecture registres (34) | ✅ Complété | ✅ 34/34 (2025-01-10) |
+| Mapping TOUG vs RBUV | ✅ Complété | ✅ Validé par écran PAC |
+| Tests écriture USB | ✅ Complété | ✅ 8/10 (échecs attendus) |
 | Écriture mode PAC (0x17) | 🔄 En cours | ⚠️ À revalider |
-| Écriture paramètres ventilation | 🔄 En cours | ⚠️ À revalider |
 | Intégration ESPHome | 🔄 En cours | ⚠️ À revalider |
 | Écriture consignes thermostats | ❌ Impossible | ✅ Confirmé (hardware) |
+
+### Découvertes clés (modèles sans ECS)
+
+| Registre | TOUG (avec ECS) | RBUV (sans ECS) |
+|----------|-----------------|-----------------|
+| **R39** | T° extérieure | T° Zone 4 |
+| **R112** | Sonde ECS bas | **T° extérieure** |
+| **R117** | Échangeur capillaire | **T° sortie compresseur** |
+| **R44** | T° sortie compresseur | ❌ Non implémenté |
+
+> **Important** : Sur les modèles RBUV sans ECS, certains registres ont une fonction différente de TOUG.
 
 ### Ce qui reste à faire
 
 Voir la [matrice de tests complète](tests/README.md) pour le détail des validations.
 
-- [ ] Revalider tous les registres TOUG sur modèle RBUV
+- [x] ~~Revalider tous les registres TOUG sur modèle RBUV~~ ✅ 2025-01-10
+- [x] ~~Tests écriture Modbus standard (USB)~~ ✅ 2025-01-10
+- [ ] Tests écriture Modbus standard (RS485)
+- [ ] Sniffing télécommande (protocole 0x17)
 - [ ] Tester le composant ESPHome en conditions réelles
 - [ ] Valider la stabilité long terme
-- [ ] Documenter les cas d'erreur
 - [ ] Tests avec différentes versions firmware PAC
 
 ---
