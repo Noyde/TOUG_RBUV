@@ -1,0 +1,17 @@
+# Secrets ESPHome
+secrets.yaml
+.esphome/
+
+# Fichiers temporaires
+*.pyc
+__pycache__/
+*.log
+.DS_Store
+
+# Captures temporaires (garder seulement les exemples)
+captures/*.bin
+!captures/example_*.bin
+
+# IDE
+.vscode/
+.idea/
