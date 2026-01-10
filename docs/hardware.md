@@ -76,7 +76,7 @@ Guide du matériel nécessaire et schémas de câblage pour l'intégration de la
 
 ---
 
-## 4. Connecteur télécommande PAC (J17)
+## 4. Connecteur télécommande PAC
 
 Le connecteur télécommande de la PAC fournit l'alimentation et le bus RS485 :
 
