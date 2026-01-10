@@ -16,7 +16,7 @@ import time
 import serial
 
 # Configuration
-SERIAL_PORT = "/dev/ttyACM0"
+SERIAL_PORT = "/dev/ttyACM1"
 BAUDRATE = 1200
 MODBUS_ADDRESS = 0x01
 

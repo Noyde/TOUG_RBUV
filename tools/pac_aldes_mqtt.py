@@ -34,7 +34,7 @@ MQTT_BASE_TOPIC = "homeassistant"
 MQTT_STATE_TOPIC = "pac_aldes"
 
 # Modbus USB
-SERIAL_PORT = "/dev/ttyACM0"     # Port USB de la PAC (vérifier avec dmesg)
+SERIAL_PORT = "/dev/ttyACM1"     # Port USB de la PAC (vérifier avec dmesg)
 BAUDRATE = 1200                  # Bus USB = 1200 bauds (NE PAS MODIFIER)
 MODBUS_ADDRESS = 0x01
 

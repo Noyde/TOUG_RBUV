@@ -94,7 +94,7 @@ TOUG_RBUV/
 
 ### Raspberry Pi Zero 2 W (lecture USB)
 - Connecté au port USB de la PAC
-- Port : /dev/ttyACM0
+- Port : /dev/ttyACM1
 - Script pac_aldes_mqtt.py actif (service systemd)
 - Paramètres : 1200 bauds, parité EVEN
 
@@ -157,7 +157,7 @@ TOUG_RBUV/
 # Lecture registre via Pi Zero (USB 1200 bauds)
 python3 -c "
 import minimalmodbus
-instr = minimalmodbus.Instrument('/dev/ttyACM0', 1)
+instr = minimalmodbus.Instrument('/dev/ttyACM1', 1)
 instr.serial.baudrate = 1200
 instr.serial.parity = 'E'
 instr.serial.timeout = 1

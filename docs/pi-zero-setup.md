@@ -110,7 +110,7 @@ exit  # Se déconnecter et reconnecter
 ls -la /dev/ttyACM*
 ```
 
-Résultat attendu : `/dev/ttyACM0`
+Résultat attendu : `/dev/ttyACM1`
 
 ---
 
@@ -120,7 +120,7 @@ Résultat attendu : `/dev/ttyACM0`
 
 | Paramètre | Valeur |
 |-----------|--------|
-| **Port série** | `/dev/ttyACM0` |
+| **Port série** | `/dev/ttyACM1` |
 | **Baudrate** | 1200 |
 | **Parité** | EVEN |
 | **Stop bits** | 1 |
@@ -217,7 +217,7 @@ Le script publie automatiquement la configuration MQTT Discovery. Les entités a
 | Problème | Cause probable | Solution |
 |----------|----------------|----------|
 | Pi ne démarre pas sur USB PAC | Courant insuffisant | Alimentation externe via port PWR |
-| Port série non détecté | Câble ou adaptateur défectueux | Vérifier `/dev/ttyACM0` |
+| Port série non détecté | Câble ou adaptateur défectueux | Vérifier `/dev/ttyACM1` |
 | Erreur connexion MQTT | Mauvaise IP broker | Vérifier MQTT_BROKER dans le script |
 | Valeurs aberrantes | Mauvais diviseur | Vérifier le script |
 | Service ne démarre pas | Mauvais chemin/utilisateur | Vérifier pac_aldes.service |
@@ -228,7 +228,7 @@ Le script publie automatiquement la configuration MQTT Discovery. Les entités a
 ls -la /dev/ttyACM* /dev/ttyUSB*
 
 # Tester la connexion série
-python3 -c "import serial; s=serial.Serial('/dev/ttyACM0', 1200); print('OK')"
+python3 -c "import serial; s=serial.Serial('/dev/ttyACM1', 1200); print('OK')"
 
 # Vérifier la connectivité réseau
 ping -c 3 <IP_BROKER_MQTT>
