@@ -109,6 +109,17 @@ Documentation des registres Modbus accessibles en lecture via USB.
 
 ---
 
+## Compteurs / Timers
+
+| Registre | Nom | Unité | Notes |
+|----------|-----|-------|-------|
+| 90 | Timer compresseur (?) | sec | Compteur incrémental, usage exact inconnu |
+| 131 | Timer dégivrage (?) | sec | Temps depuis dernier dégivrage (hypothèse) |
+
+> **Note** : R90 et R131 sont des compteurs en secondes. Leur signification exacte reste à confirmer.
+
+---
+
 ## Débits / Pressions
 
 | Registre | Hex | Nom | Unité | Diviseur |
@@ -150,7 +161,7 @@ Le modèle RBUV n'a pas d'ECS (Eau Chaude Sanitaire). Certains registres sont do
 
 | Registre | Description TOUG | Statut RBUV |
 |----------|------------------|-------------|
-| R44 | T° sortie compresseur | ❌ Valeur aberrante |
+| R44 | T° sortie compresseur | ❌ Valeur aberrante (~592°C, utiliser R117) |
 | R91 | Position EEV1 | ❌ Retourne 0 |
 | R93 | Vitesse ventilateur UE | ❌ Retourne 0 |
 | 5029 | Canaux actifs | ❌ Retourne 0 |
