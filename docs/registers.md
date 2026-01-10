@@ -133,6 +133,34 @@ Documentation des registres Modbus accessibles en lecture via USB.
 
 ---
 
+## Différences TOUG vs RBUV
+
+> ⚠️ **Important** : Le mapping des registres diffère selon le modèle (avec/sans ECS).
+
+Le modèle RBUV n'a pas d'ECS (Eau Chaude Sanitaire). Certains registres sont donc réassignés :
+
+| Registre | TOUG (avec ECS) | RBUV (sans ECS) |
+|----------|-----------------|-----------------|
+| **R39** | T° extérieure (ThoA) | T° Zone 4 |
+| **R44** | T° sortie compresseur | ❌ Non implémenté (592°C) |
+| **R112** | Sonde ECS bas | **T° extérieure** |
+| **R117** | Échangeur air capillaire Th6 | **T° sortie compresseur** |
+
+### Registres TOUG non disponibles sur RBUV
+
+| Registre | Description TOUG | Statut RBUV |
+|----------|------------------|-------------|
+| R44 | T° sortie compresseur | ❌ Valeur aberrante |
+| R91 | Position EEV1 | ❌ Retourne 0 |
+| R93 | Vitesse ventilateur UE | ❌ Retourne 0 |
+| 5029 | Canaux actifs | ❌ Retourne 0 |
+| 6021 | État circuit frigo | ❌ Retourne 0 |
+| 20063 | État filtres | ❌ Retourne 0 |
+| 30026 | Nb zones configurées | ❌ Retourne 0 |
+| 31100-31104 | Consignes thermostats | ❌ KO tous modèles |
+
+---
+
 ## Ressources
 
 | Ressource | Lien |
