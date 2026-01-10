@@ -2,6 +2,22 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+---
+
+## ⚠️ AVERTISSEMENT - PROJET EN BETA
+
+> **CE PROJET EST EN COURS DE DÉVELOPPEMENT**
+>
+> - 🚧 **Version BETA** - Nombreuses validations encore nécessaires
+> - ⚠️ **UTILISATION À VOS RISQUES ET PÉRILS**
+> - 🔬 Basé sur du reverse engineering (protocole non documenté par Aldes)
+> - 🐛 Des bugs et comportements inattendus sont possibles
+> - 🏠 Ne pas utiliser en production sans tests approfondis
+>
+> **L'auteur décline toute responsabilité en cas de dysfonctionnement de votre PAC.**
+
+---
+
 ## 🙏 Remerciements
 
 Ce projet est un **complément** au projet [TOUG](https://github.com/djtef/toug) créé par **@djtef**.
@@ -30,7 +46,7 @@ Les PAC Aldes T.One **RBUV (série 2018 et antérieures)** présentent des diff�
 
 - **Pas de connecteur Modbus utilisateur dédié** → connexion via bus télécommande uniquement
 - **Écriture Modbus bloquée** → `illegal data address` sur les registres d'écriture (USB et RS485)
-- **Protocole différent** pour certaines commandes
+- **Protocole propriétaire 0x17** → seule méthode d'écriture fonctionnelle
 
 Ce projet documente ces spécificités et propose des solutions adaptées.
 
@@ -42,7 +58,9 @@ Ce projet documente ces spécificités et propose des solutions adaptées.
 |--------|------------------------|--------------------------|
 | **Connecteur Modbus utilisateur** | ✅ Présent | ❌ Absent |
 | **Lecture Modbus USB** | ✅ | ✅ Identique |
-| **Bus télécommande** | RS485 standard | RS485 (seule option écriture) |
+| **Écriture Modbus standard** | ✅ | ❌ Bloquée |
+| **Protocole 0x17** | Non nécessaire | ✅ Seule méthode écriture |
+| **Bus télécommande** | RS485 standard | RS485 (19200 bauds) |
 
 ---
 
@@ -57,24 +75,26 @@ Ce projet documente ces spécificités et propose des solutions adaptées.
 | **Référence UE** | RBUV04F |
 | **Année** | 2018 |
 
-### Matériel d'intégration
+### Options d'intégration
 
-- **Option 1** : Raspberry Pi Zero 2 W + adaptateur USB-RS485 (lecture seule)
-- **Option 2** : ESP32 + module RS485 MAX485 (TOUG standard)
+| Option | Lecture | Écriture | Coût |
+|--------|---------|----------|------|
+| **Pi Zero USB** | ✅ | ❌ | ~28€ |
+| **ESP32 RS485** | ✅ | ✅ (0x17) | ~25€ |
 
 ---
 
 ## 📦 Installation
 
-> 🚧 **En cours de développement** - Documentation complète à venir
+> 🚧 **En cours de développement** - Testez avec prudence
 
-### Lecture seule (Pi Zero)
+### Option 1 : Lecture seule (Pi Zero)
 
 Voir [docs/pi-zero-setup.md](docs/pi-zero-setup.md)
 
-### Intégration ESPHome
+### Option 2 : Lecture + Écriture (ESP32)
 
-Voir [docs/esphome-setup.md](docs/esphome-setup.md)
+Voir [esphome/README.md](esphome/README.md)
 
 ---
 
@@ -82,21 +102,41 @@ Voir [docs/esphome-setup.md](docs/esphome-setup.md)
 
 | Document | Description |
 |----------|-------------|
-| [docs/registers.md](docs/registers.md) | Mapping des registres Modbus |
-| [docs/protocol.md](docs/protocol.md) | Analyse du protocole |
+| [docs/registers.md](docs/registers.md) | Mapping des 34 registres Modbus |
+| [docs/protocol.md](docs/protocol.md) | Analyse du protocole 0x17 |
 | [docs/hardware.md](docs/hardware.md) | Schémas de câblage |
+| [docs/pi-zero-setup.md](docs/pi-zero-setup.md) | Guide Pi Zero |
+| [esphome/README.md](esphome/README.md) | Guide ESPHome |
 
 ---
 
 ## 📊 Statut du projet
 
-| Fonctionnalité | Statut |
-|----------------|--------|
-| Lecture registres (34) | 🔄 En cours |
-| Dashboard Home Assistant | 🔄 En cours |
-| Écriture mode PAC | 🔄 En cours (bus télécommande) |
-| Écriture consignes | 🔄 En cours |
-| Intégration ESPHome | 🔄 En cours |
+| Fonctionnalité | Statut | Validé |
+|----------------|--------|--------|
+| Lecture registres (34) | 🔄 En cours | ⚠️ Partiellement |
+| Dashboard Home Assistant | 🔄 En cours | ⚠️ Partiellement |
+| Écriture mode PAC (0x17) | 🔄 En cours | ⚠️ À revalider |
+| Écriture paramètres ventilation | 🔄 En cours | ⚠️ À revalider |
+| Intégration ESPHome | 🔄 En cours | ⚠️ À revalider |
+| Écriture consignes thermostats | ❌ Impossible | ✅ Confirmé (hardware) |
+
+### Ce qui reste à faire
+
+- [ ] Revalider tous les registres sur différentes PAC RBUV
+- [ ] Tester le composant ESPHome en conditions réelles
+- [ ] Valider la stabilité long terme
+- [ ] Documenter les cas d'erreur
+- [ ] Tests avec différentes versions firmware PAC
+
+---
+
+## ⚠️ Limitations connues
+
+1. **Consignes thermostats NON modifiables** - Hardware read-only (pilotées par radio 868MHz)
+2. **Télécommande doit être débranchée** - Collision sur le bus RS485 sinon
+3. **Protocole non officiel** - Reverse engineering, peut changer selon firmware
+4. **Testé sur UN SEUL modèle** - RBUV04F 2018
 
 ---
 
@@ -111,4 +151,17 @@ Voir [docs/esphome-setup.md](docs/esphome-setup.md)
 
 ---
 
+## 🤝 Contribuer
+
+Ce projet est en beta. Toute aide est bienvenue :
+
+- 🐛 Signaler des bugs
+- 📝 Améliorer la documentation
+- 🧪 Tester sur d'autres modèles RBUV
+- 💡 Proposer des améliorations
+
+---
+
 *2025 - Noyde*
+
+**⚠️ RAPPEL : Projet BETA - Utilisation à vos risques et périls**
