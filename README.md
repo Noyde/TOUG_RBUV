@@ -107,6 +107,7 @@ Voir [esphome/README.md](esphome/README.md)
 | [docs/hardware.md](docs/hardware.md) | Schémas de câblage |
 | [docs/pi-zero-setup.md](docs/pi-zero-setup.md) | Guide Pi Zero |
 | [esphome/README.md](esphome/README.md) | Guide ESPHome |
+| [tests/README.md](tests/README.md) | **Matrice de tests TOUG + RBUV** |
 
 ---
 
@@ -123,7 +124,9 @@ Voir [esphome/README.md](esphome/README.md)
 
 ### Ce qui reste à faire
 
-- [ ] Revalider tous les registres sur différentes PAC RBUV
+Voir la [matrice de tests complète](tests/README.md) pour le détail des validations.
+
+- [ ] Revalider tous les registres TOUG sur modèle RBUV
 - [ ] Tester le composant ESPHome en conditions réelles
 - [ ] Valider la stabilité long terme
 - [ ] Documenter les cas d'erreur
