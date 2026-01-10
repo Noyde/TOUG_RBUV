@@ -116,28 +116,28 @@ TOUG_RBUV/
 
 ## Tests à refaire et documenter
 
-### Tests lecture Modbus (à revalider)
+### Tests lecture Modbus ✅ COMPLÉTÉS (2025-01-10)
 
 | Test | Bus | Baudrate | Registres | Statut |
 |------|-----|----------|-----------|--------|
-| Lecture R1-R9 (système) | USB | 1200 | 1,3,9 | À refaire |
-| Lecture R20-R25 (consignes) | USB | 1200 | 20-25 | À refaire |
-| Lecture R36-R41 (températures zones) | USB | 1200 | 36-41 | À refaire |
-| Lecture R60-R66 (ventilation/compresseur) | USB | 1200 | 60-66 | À refaire |
-| Lecture R104-R117 (PAC interne) | USB | 1200 | 104-117 | À refaire |
-| Lecture R247-R251 (débits/pressions) | USB | 1200 | 247-251 | À refaire |
-| Lecture via bus télécommande | RS485 | 19200 | Tous | À refaire |
+| Lecture R1-R9 (système) | USB | 1200 | 1,3,9 | ✅ OK |
+| Lecture R20-R25 (consignes) | USB | 1200 | 20-25 | ✅ OK |
+| Lecture R36-R41 (températures zones) | USB | 1200 | 36-41 | ✅ OK |
+| Lecture R60-R66 (ventilation/compresseur) | USB | 1200 | 60-66 | ✅ OK |
+| Lecture R104-R117 (PAC interne) | USB | 1200 | 104-117 | ✅ OK |
+| Lecture R247-R251 (débits/pressions) | USB | 1200 | 247-251 | ✅ OK |
+| Lecture via bus télécommande | RS485 | 19200 | Tous | ⬜ À faire |
 
-### Tests écriture Modbus standard (échecs attendus)
+### Tests écriture Modbus standard ✅ USB COMPLÉTÉS (2025-01-10)
 
-| Test | Bus | FC | Registre | Résultat attendu |
-|------|-----|-----|----------|------------------|
-| Écriture R9 (mode) | USB | 0x06 | 9 | illegal function |
-| Écriture R9 (mode) | USB | 0x10 | 9 | illegal data address |
-| Écriture R9 (mode) | RS485 | 0x06 | 9 | illegal function |
-| Écriture R9 (mode) | RS485 | 0x10 | 9 | illegal data address |
-| Écriture R25 (consigne) | USB | 0x06 | 25 | illegal data address |
-| Écriture R31100-31104 (TOUG) | USB | 0x06 | 31100+ | illegal data address |
+| Test | Bus | FC | Registre | Résultat |
+|------|-----|-----|----------|----------|
+| Écriture R9 (mode) | USB | 0x06 | 9 | ✅ illegal function |
+| Écriture R9 (mode) | USB | 0x10 | 9 | ✅ illegal data address |
+| Écriture R9 (mode) | RS485 | 0x06 | 9 | ⬜ À faire |
+| Écriture R9 (mode) | RS485 | 0x10 | 9 | ⬜ À faire |
+| Écriture R20 (consigne) | USB | 0x06 | 20 | ✅ illegal data address |
+| Écriture R31100-31104 (TOUG) | USB | 0x06 | 31100+ | ✅ illegal data address |
 
 ### Tests protocole 0x17 (sniffing télécommande)
 
@@ -302,6 +302,15 @@ Sniffing RS485 avec :
 
 Les fonctions Modbus standard (0x03, 0x06, 0x10) retournaient `illegal data address` ou `illegal function`, ce qui a conduit à analyser les trames de la télécommande.
 
+### Éléments validés (2025-01-10)
+
+| Élément | Statut |
+|---------|--------|
+| Mapping registres TOUG vs RBUV | ✅ Validé par écran PAC |
+| R112 = T° extérieure | ✅ Confirmé (8.3°C écran = 8.38°C Modbus) |
+| R117 = T° sortie compresseur | ✅ Confirmé (47.9°C écran = 46.40°C Modbus) |
+| Compteurs R90/R131 | ✅ Incrémentent en temps réel |
+
 ### Éléments non validés
 
 | Élément | Statut |
@@ -323,7 +332,9 @@ Existe sur l'installation locale (Mushroom Cards, 5 onglets) mais pas encore exp
 
 ### Ce qui bloque la publication
 
-- Revalidation complète de tous les tests
+- ~~Revalidation complète de tous les tests~~ ✅ Lecture complétée (2025-01-10)
+- Tests écriture RS485 (W03-W04)
+- Tests protocole 0x17 (sniffing + envoi)
 - Tests long terme du composant ESPHome
 - Documentation des cas d'erreur
 
