@@ -151,8 +151,8 @@ sudo apt install python3-serial
 
 | ID | Reg | FC | Bus | Attendu | Résultat | Date |
 |----|-----|-----|-----|---------|----------|------|
-| W01 | 9 | 0x06 | USB | illegal function | ⬜ | |
-| W02 | 9 | 0x10 | USB | illegal data address | ⬜ | |
+| W01 | 9 | 0x06 | USB | illegal function | ✅ illegal function | 2025-01-10 |
+| W02 | 9 | 0x10 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W03 | 9 | 0x06 | RS485 | illegal function | ⬜ | |
 | W04 | 9 | 0x10 | RS485 | illegal data address | ⬜ | |
 | W05 | 20 | 0x06 | USB | illegal data address | ⬜ | |
