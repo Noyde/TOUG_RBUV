@@ -168,7 +168,7 @@ Le modèle RBUV n'a pas d'ECS (Eau Chaude Sanitaire). Certains registres sont do
 | 6021 | État circuit frigo | ❌ Retourne 0 |
 | 20063 | État filtres | ❌ Retourne 0 |
 | 30026 | Nb zones configurées | ❌ Retourne 0 |
-| 31100-31104 | Consignes thermostats | ❌ KO tous modèles |
+| 31100-31104 | Écriture consignes thermostats | ❌ KO tous modèles (écriture impossible) |
 
 ---
 
