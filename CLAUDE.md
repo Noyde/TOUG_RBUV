@@ -21,7 +21,15 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 
 ### Limitations hardware confirmées
 - Consignes thermostats (R20-R25) = read-only (pilotées par radio 868MHz)
-- Registres TOUG 31100-31104 = non implémentés sur modèle 2018
+- Registres TOUG 31100-31104 = non implémentés sur **aucun modèle** (confirmé par @djtef)
+
+### Mapping registres différent (RBUV sans ECS)
+| Registre | TOUG (avec ECS) | RBUV (sans ECS) |
+|----------|-----------------|-----------------|
+| R39 | T° extérieure | T° Zone 4 |
+| R112 | Sonde ECS bas | **T° extérieure** |
+| R117 | Échangeur capillaire | **T° sortie compresseur** |
+| R44 | T° sortie compresseur | ❌ Non implémenté |
 
 ## Structure trame 0x17 (74 bytes)
 - Offset 18-19: Niveau (0x0000=Confort, 0x00C8=Eco, 0x5678=Boost)
