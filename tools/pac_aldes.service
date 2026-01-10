@@ -1,0 +1,15 @@
+[Unit]
+Description=PAC Aldes T.One MQTT Reader (TOUG_RBUV)
+After=network.target
+
+[Service]
+Type=simple
+User=VOTRE_UTILISATEUR
+Group=VOTRE_UTILISATEUR
+WorkingDirectory=/home/VOTRE_UTILISATEUR
+ExecStart=/usr/bin/python3 /home/VOTRE_UTILISATEUR/pac_aldes_mqtt.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
