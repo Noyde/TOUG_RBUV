@@ -33,12 +33,12 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 ## Mapping thermostats corrigé
 | Registre | Zone |
 |----------|------|
-| 20 | Salon (K1a) |
-| 21 | Cuisine (K1b) - même thermostat que 20 |
-| 22 | Ch. Parentale |
-| 23 | Bureau |
-| 24 | Ch. Angèle |
-| 25 | Ch. Marcus |
+| 20 | Zone 1 (K1a) |
+| 21 | Zone 1 bis (K1b) - même thermostat que 20 |
+| 22 | Zone 2 |
+| 23 | Zone 3 |
+| 24 | Zone 4 |
+| 25 | Zone 5 |
 
 ## Statut projet
 - ✅ Lecture 34 registres via Pi Zero USB
