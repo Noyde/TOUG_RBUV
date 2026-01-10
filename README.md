@@ -29,7 +29,7 @@ Un immense merci à lui pour son travail de reverse engineering sur les PAC Alde
 Les PAC Aldes T.One **RBUV (série 2018 et antérieures)** présentent des différences avec les modèles récents :
 
 - **Pas de connecteur Modbus utilisateur dédié** → connexion via bus télécommande uniquement
-- **Écriture USB bloquée** → `illegal data address` sur les registres d'écriture
+- **Écriture Modbus bloquée** → `illegal data address` sur les registres d'écriture (USB et RS485)
 - **Protocole différent** pour certaines commandes
 
 Ce projet documente ces spécificités et propose des solutions adaptées.
@@ -41,7 +41,6 @@ Ce projet documente ces spécificités et propose des solutions adaptées.
 | Aspect | TOUG (modèles récents) | TOUG_RBUV (modèles 2018) |
 |--------|------------------------|--------------------------|
 | **Connecteur Modbus utilisateur** | ✅ Présent | ❌ Absent |
-| **Écriture via USB** | ✅ Fonctionne | ❌ Bloqué |
 | **Lecture Modbus USB** | ✅ | ✅ Identique |
 | **Bus télécommande** | RS485 standard | RS485 (seule option écriture) |
 
@@ -57,7 +56,6 @@ Ce projet documente ces spécificités et propose des solutions adaptées.
 | **Référence UI** | RBC04MX |
 | **Référence UE** | RBUV04F |
 | **Année** | 2018 |
-| **Fluide** | R410a (1.5 kg) |
 
 ### Matériel d'intégration
 
