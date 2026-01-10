@@ -15,3 +15,7 @@ captures/*.bin
 # IDE
 .vscode/
 .idea/
+
+# Résultats de tests (garder seulement .gitkeep)
+tests/results/*
+!tests/results/.gitkeep

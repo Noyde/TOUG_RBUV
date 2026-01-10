@@ -60,6 +60,7 @@ TOUG_RBUV/
 ├── README.md                    # Documentation principale (FR)
 ├── LICENSE                      # Licence MIT
 ├── .gitignore                   # Exclusions git
+├── CLAUDE.md                    # Instructions pour Claude Code
 ├── docs/                        # Documentation technique
 │   ├── hardware.md              # Schémas de câblage matériel
 │   ├── pi-zero-setup.md         # Guide installation Raspberry Pi
@@ -72,6 +73,9 @@ TOUG_RBUV/
 │       └── aldes_tone/
 │           ├── __init__.py      # Définition composant Python
 │           └── aldes_tone.h     # Code C++ protocole 0x17
+├── tests/                       # Tests et validation
+│   ├── README.md                # Matrice de tests TOUG + RBUV
+│   └── results/                 # Résultats horodatés
 └── tools/                       # Scripts et services
     ├── pac_aldes_mqtt.py        # Script Python Modbus→MQTT
     └── pac_aldes.service        # Service systemd
@@ -261,7 +265,59 @@ Messages préfixés :
 1. **Consignes thermostats (R20-R25)** : READ-ONLY au niveau hardware. Pilotées par radio 868MHz.
 2. **Télécommande Aldes** : Doit être DÉBRANCHÉE pour utiliser l'ESP32. Collisions garanties sinon.
 3. **Écriture USB** : IMPOSSIBLE sur modèles 2018. Seul le bus RS485 accepte le protocole 0x17.
-4. **Registres TOUG 31100-31104** : Non implémentés sur firmware 3019.
+4. **Registres TOUG 31100-31104** : Ne fonctionnent sur **aucun modèle** T.One (confirmé par @djtef). Erreur dans la doc TOUG.
+
+---
+
+## Notes techniques
+
+### Réponses protocole 0x17
+
+La PAC répond aux trames 0x17 avec deux types de réponses :
+- `0117 80xx` : Réponse principale contenant les données capteurs
+- `0117 78xx` : Données additionnelles
+
+Pas d'ACK explicite - la réponse contient directement les données.
+
+### Cycle de la télécommande
+
+La télécommande émet en continu avec un cycle de 4 sous-codes :
+- 0x0001 → 0x0041 → 0x0081 → 0x00C1 → (répète)
+
+**Une seule trame suffit à changer l'état de la PAC.** Pas de délai minimum identifié entre les envois.
+
+### Méthode de découverte du protocole
+
+Sniffing RS485 avec :
+- Raspberry Pi 2B + convertisseur USB-RS485 Waveshare (FT232RL)
+- Connexion en parallèle sur le bus télécommande via Wago
+
+Les fonctions Modbus standard (0x03, 0x06, 0x10) retournaient `illegal data address` ou `illegal function`, ce qui a conduit à analyser les trames de la télécommande.
+
+### Éléments non validés
+
+| Élément | Statut |
+|---------|--------|
+| Seuils d'alerte (docs/registers.md) | Basés sur doc Aldes, non validés formellement |
+| Codes erreur PAC | Non explorés, registres inconnus |
+| Comportement mode Vacances (0x1234) | Placeholder, comportement exact non validé |
+| Tests mode clim | Limités (conditions météo) |
+| Composant ESPHome long terme | Non testé en conditions réelles |
+
+### Bugs connus
+
+1. **Collision bus RS485** : Si télécommande branchée en même temps que ESP32 → 2 maîtres sur le bus → erreurs CRC massives
+2. **Valeur vacances 0x1234** : Fonctionne pour activer le mode mais comportement exact de la PAC non documenté
+
+### Dashboard Home Assistant
+
+Existe sur l'installation locale (Mushroom Cards, 5 onglets) mais pas encore exporté dans le repo. À ajouter si pertinent.
+
+### Ce qui bloque la publication
+
+- Revalidation complète de tous les tests
+- Tests long terme du composant ESPHome
+- Documentation des cas d'erreur
 
 ---
 
