@@ -15,4 +15,3 @@ captures/*.bin
 # IDE
 .vscode/
 .idea/
-CLAUDE.md
