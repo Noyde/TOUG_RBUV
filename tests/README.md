@@ -30,16 +30,30 @@ sudo apt install python3-serial
 
 ---
 
-## Résumé des tests (2025-01-10)
+## Résumé des tests (2025-01-11)
 
-| Groupe | Total | OK | KO | Notes |
-|--------|-------|----|----|-------|
-| RBUV (34 registres) | 34 | 34 | 0 | ✅ Tous fonctionnent |
-| TOUG System | 7 | 5 | 2 | R16/R17 non fonctionnels |
-| TOUG Temperatures | 3 | 3 | 0 | R44 valeur aberrante |
-| TOUG Ventilation | 4 | 4 | 0 | R91/R93 = 0 |
-| TOUG Extended | 4 | 0 | 4 | ❌ Non implémentés (tous = 0) |
-| TOUG Consignes | 5 | 0 | 5 | ❌ Confirmé KO (tous = 0) |
+| Groupe | Total | OK | KO | À faire | Notes |
+|--------|-------|----|----|---------|-------|
+| **Lecture USB** | | | | | |
+| RBUV (34 registres) | 34 | 34 | 0 | 0 | ✅ Tous fonctionnent |
+| TOUG System | 7 | 5 | 2 | 0 | R16/R17 non fonctionnels |
+| TOUG Temperatures | 3 | 3 | 0 | 0 | R44 valeur aberrante |
+| TOUG Ventilation | 4 | 4 | 0 | 0 | R91/R93 = 0 |
+| TOUG Extended | 4 | 0 | 4 | 0 | ❌ Non implémentés |
+| TOUG Consignes | 5 | 0 | 5 | 0 | ❌ Confirmé KO |
+| **Écriture Modbus** | | | | | |
+| USB (standard) | 8 | 0 | 8 | 0 | ✅ Échec attendu |
+| RS485 (standard) | 2 | 0 | 0 | 2 | ⬜ W03-W04 |
+| **Protocole 0x17** | | | | | |
+| Sniff modes PAC | 10 | 0 | 0 | 10 | ⬜ X01-X10 |
+| Sniff ventilation | 8 | 0 | 0 | 8 | ⬜ X11-X18 |
+| Sniff date/heure | 5 | 0 | 0 | 5 | ⬜ X19-X23 |
+| Sniff consignes | 4 | 0 | 0 | 4 | ⬜ X24-X27 |
+| Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
+| Envoi modes PAC | 7 | 0 | 0 | 7 | ⬜ Y01-Y07 |
+| Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
+| Envoi date/heure | 2 | 0 | 0 | 2 | ⬜ Y14-Y15 |
+| Réponses PAC | 5 | 0 | 0 | 5 | ⬜ Z01-Z05 |
 
 ---
 
@@ -168,6 +182,32 @@ sudo apt install python3-serial
 
 ## 3. Tests protocole 0x17 (spécifique RBUV)
 
+### 3.0 Structure trame 0x17 (74 bytes)
+
+> **Référence** : Basé sur l'analyse de `esphome/components/aldes_tone/aldes_tone.h`
+
+| Offset | Taille | Description | Valeurs connues |
+|--------|--------|-------------|-----------------|
+| 0 | 1 | Adresse Modbus | 0x01 |
+| 1 | 1 | Fonction | 0x17 (Read/Write Multiple) |
+| 2-3 | 2 | Sous-code séquence | 0x0001→0x0041→0x0081→0x00C1 (cycle) |
+| 4-5 | 2 | Longueur | 0x0040 |
+| 6-9 | 4 | Constantes | 0x00570x001F |
+| 10-11 | 2 | Signature | 0x7370 ("sp") |
+| 12-13 | 2 | Version | 0x1804 |
+| 14-17 | 4 | ? | À identifier |
+| **18-19** | 2 | **Niveau** | 0x0000=Confort, 0x00C8=Eco, 0x5678=Boost |
+| 20-27 | 8 | ? | À identifier |
+| **28-29** | 2 | **Débit nominal** | 0x0384=900 m³/h (hypothèse) |
+| **30-31** | 2 | **PSE débit nominal** | 0x0017=23 Pa (hypothèse) |
+| **32-33** | 2 | **Vacances** | 0x0000=Off, 0x1234=On |
+| **34-35** | 2 | **On/Off** | 0x0002=Off, 0x0003=On |
+| **36-37** | 2 | **Type mode** | 0x000C=Chauffage, 0x000A=Clim |
+| 38-39 | 2 | ? | À identifier |
+| 40-69 | 30 | Consignes (?) | Pattern 0x7FFE = pas de changement ? |
+| 70-71 | 2 | ? | À identifier |
+| 72-73 | 2 | CRC16 Modbus | Calculé |
+
 ### 3.1 Sniffing télécommande
 
 **Matériel** : Pi 2B + Waveshare RS485 en parallèle sur bus télécommande
@@ -176,6 +216,8 @@ sudo apt install python3-serial
 ```bash
 python3 tests/sniff_rs485.py --output capture.bin
 ```
+
+#### 3.1.1 Modes PAC (On/Off, Chauffage/Clim)
 
 | ID | Action télécommande | Offset | Valeur attendue | Résultat | Date |
 |----|---------------------|--------|-----------------|----------|------|
@@ -190,19 +232,92 @@ python3 tests/sniff_rs485.py --output capture.bin
 | X09 | Vacances Off | 32-33 | 0x0000 | ⬜ | |
 | X10 | Cycle sous-codes | 2-3 | 01→41→81→C1 | ⬜ | |
 
+#### 3.1.2 Ventilation / Débits
+
+> **Objectif** : Valider les offsets supposés (28-31) et trouver les autres.
+
+| ID | Action télécommande | Offset supposé | Valeur attendue | Résultat | Date |
+|----|---------------------|----------------|-----------------|----------|------|
+| X11 | Menu → Débit nominal ↑ | 28-29 | Incrémenté (+20) | ⬜ | |
+| X12 | Menu → Débit nominal ↓ | 28-29 | Décrémenté (-20) | ⬜ | |
+| X13 | Menu → PSE nominal ↑ | 30-31 | Incrémenté (+1) | ⬜ | |
+| X14 | Menu → PSE nominal ↓ | 30-31 | Décrémenté (-1) | ⬜ | |
+| X15 | Menu → Débit mini ↑ | ? | Chercher offset | ⬜ | |
+| X16 | Menu → Débit mini ↓ | ? | Chercher offset | ⬜ | |
+| X17 | Menu → PSE mini ↑ | ? | Chercher offset | ⬜ | |
+| X18 | Menu → PSE mini ↓ | ? | Chercher offset | ⬜ | |
+
+#### 3.1.3 Date/Heure
+
+> **Objectif** : Déterminer si la date/heure est transmise dans la trame 0x17 et à quel offset.
+> **Note** : R16/R17 non fonctionnels via USB, la date/heure pourrait être dans la trame 0x17.
+
+| ID | Action télécommande | Offset recherché | Observation | Résultat | Date |
+|----|---------------------|------------------|-------------|----------|------|
+| X19 | Capture sans changement | 14-17 ? 20-27 ? | Noter valeurs actuelles | ⬜ | |
+| X20 | Changement heure +1h | ? | Chercher bytes modifiés | ⬜ | |
+| X21 | Changement date +1j | ? | Chercher bytes modifiés | ⬜ | |
+| X22 | Changement année | ? | Chercher bytes modifiés | ⬜ | |
+| X23 | Format encodage | ? | BCD ? Unix ? Custom ? | ⬜ | |
+
+#### 3.1.4 Consignes thermostats
+
+> **Note** : Les consignes sont pilotées par thermostats radio 868MHz. Ce test vérifie si la télécommande peut aussi les modifier via 0x17.
+> **Hypothèse** : Offset 40-69 contient les consignes, pattern 0x7FFE = "pas de changement"
+
+| ID | Action télécommande | Offset supposé | Observation | Résultat | Date |
+|----|---------------------|----------------|-------------|----------|------|
+| X24 | Capture trame normale | 40-69 | Noter pattern (0x7FFE?) | ⬜ | |
+| X25 | Menu consigne zone 1 ↑ | 40-41 ? | Chercher changement | ⬜ | |
+| X26 | Menu consigne zone 1 ↓ | 40-41 ? | Chercher changement | ⬜ | |
+| X27 | Consigne différente par zone | 40-69 | Identifier mapping | ⬜ | |
+
+#### 3.1.5 Analyse trame complète
+
+| ID | Test | Description | Résultat | Date |
+|----|------|-------------|----------|------|
+| X28 | Dump trame 74 bytes | Capturer et annoter tous les octets | ⬜ | |
+| X29 | Comparer trames successives | Identifier bytes qui changent | ⬜ | |
+| X30 | Valider CRC | Vérifier calcul CRC16 Modbus (octets 72-73) | ⬜ | |
+| X31 | Identifier octets inconnus | Offsets 14-17, 20-27, 38-39, 70-71 | ⬜ | |
+
 ### 3.2 Envoi trame (ESP32 → PAC)
 
 **Prérequis** : Télécommande DÉBRANCHÉE
 
-| ID | Mode envoyé | Vérif R9 USB | Résultat | Date |
-|----|-------------|--------------|----------|------|
-| Y01 | Off | R9 = 5 | ⬜ | |
-| Y02 | Chauffage Confort | R9 = 4 | ⬜ | |
-| Y03 | Chauffage Eco | R9 = 4 | ⬜ | |
-| Y04 | Clim Confort | R9 = 2 | ⬜ | |
-| Y05 | Clim Boost | R9 = 2 | ⬜ | |
-| Y06 | Vacances On | Comportement ? | ⬜ | |
-| Y07 | Vacances Off | Retour normal | ⬜ | |
+#### 3.2.1 Modes PAC (implémenté dans aldes_tone.h)
+
+| ID | Mode envoyé | Trame (niveau, vacances, onoff, type) | Vérif R9 USB | Résultat | Date |
+|----|-------------|---------------------------------------|--------------|----------|------|
+| Y01 | Off | (0x0000, 0x0000, 0x0002, 0x000C) | R9 = 5 | ⬜ | |
+| Y02 | Chauffage Confort | (0x0000, 0x0000, 0x0003, 0x000C) | R9 = 4 | ⬜ | |
+| Y03 | Chauffage Eco | (0x00C8, 0x0000, 0x0003, 0x000C) | R9 = 4 | ⬜ | |
+| Y04 | Clim Confort | (0x0000, 0x0000, 0x0003, 0x000A) | R9 = 2 | ⬜ | |
+| Y05 | Clim Boost | (0x5678, 0x0000, 0x0003, 0x000A) | R9 = 2 | ⬜ | |
+| Y06 | Vacances On | (0x0000, 0x1234, 0x0003, 0x000C) | Comportement ? | ⬜ | |
+| Y07 | Vacances Off | (0x0000, 0x0000, 0x0003, 0x000C) | Retour normal | ⬜ | |
+
+#### 3.2.2 Ventilation / Débits (à implémenter)
+
+> **Note** : Nécessite d'abord valider les offsets via sniffing (X11-X18)
+
+| ID | Paramètre | Offset | Vérif registre USB | Résultat | Date |
+|----|-----------|--------|-------------------|----------|------|
+| Y08 | Débit nominal 900→880 | 28-29 | R250 = 880 ? | ⬜ | |
+| Y09 | Débit nominal 880→900 | 28-29 | R250 = 900 ? | ⬜ | |
+| Y10 | PSE nominal 23→25 | 30-31 | R247 = 25 ? | ⬜ | |
+| Y11 | PSE nominal 25→23 | 30-31 | R247 = 23 ? | ⬜ | |
+| Y12 | Débit mini (après sniff) | ? | R249 ? | ⬜ | |
+| Y13 | PSE mini (après sniff) | ? | R248 ? | ⬜ | |
+
+#### 3.2.3 Date/Heure (à implémenter si trouvé)
+
+> **Note** : Nécessite d'abord identifier l'offset via sniffing (X19-X23)
+
+| ID | Test | Vérification | Résultat | Date |
+|----|------|--------------|----------|------|
+| Y14 | Écriture heure | Écran PAC ? R16/R17 ? | ⬜ | |
+| Y15 | Écriture date | Écran PAC ? R16/R17 ? | ⬜ | |
 
 ### 3.3 Réponses PAC
 
@@ -211,6 +326,8 @@ python3 tests/sniff_rs485.py --output capture.bin
 | Z01 | Format réponse principale | 0117 80xx | ⬜ | |
 | Z02 | Format données additionnelles | 0117 78xx | ⬜ | |
 | Z03 | Délai réponse | < 100ms ? | ⬜ | |
+| Z04 | Contenu réponse | Quelles données ? | ⬜ | |
+| Z05 | Acquittement écriture | ACK explicite ou données ? | ⬜ | |
 
 ---
 
