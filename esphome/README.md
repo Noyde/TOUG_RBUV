@@ -48,11 +48,12 @@ wifi_ssid: "VotreSSID"
 wifi_password: "VotreMotDePasse"
 
 # Noms des zones (personnalisables)
-zone1_name: "Salon-Cuisine"
-zone2_name: "Chambre Parentale"
-zone3_name: "Bureau"
-zone4_name: "Chambre Angèle"
-zone5_name: "Chambre Marcus"
+# Note: zone1 correspond à R20/R21 (même thermostat)
+zone1_name: "Zone 1"
+zone2_name: "Zone 2"
+zone3_name: "Zone 3"
+zone4_name: "Zone 4"
+zone5_name: "Zone 5"
 zone6_name: "Zone 6"
 ```
 

@@ -44,14 +44,16 @@ Documentation des 40 registres Modbus accessibles en lecture via USB.
 
 ## Thermostats - Consignes (R20-R25)
 
-| Registre | Hex | Zone | Unité | Diviseur |
-|----------|-----|------|-------|----------|
+> **Mapping RBUV** : R20/R21 correspondent au même thermostat (Zone 1).
+
+| Registre | Hex | Zone RBUV | Unité | Diviseur |
+|----------|-----|-----------|-------|----------|
 | 20 | 0x14 | Zone 1 | °C | ÷100 |
-| 21 | 0x15 | Zone 2 | °C | ÷100 |
-| 22 | 0x16 | Zone 3 | °C | ÷100 |
-| 23 | 0x17 | Zone 4 | °C | ÷100 |
-| 24 | 0x18 | Zone 5 | °C | ÷100 |
-| 25 | 0x19 | Zone 6 | °C | ÷100 |
+| 21 | 0x15 | Zone 1 bis (même thermostat que R20) | °C | ÷100 |
+| 22 | 0x16 | Zone 2 | °C | ÷100 |
+| 23 | 0x17 | Zone 3 | °C | ÷100 |
+| 24 | 0x18 | Zone 4 | °C | ÷100 |
+| 25 | 0x19 | Zone 5 | °C | ÷100 |
 
 > **Note** : Les consignes sont pilotées par les thermostats radio 868MHz et sont en lecture seule via Modbus.
 
@@ -59,14 +61,16 @@ Documentation des 40 registres Modbus accessibles en lecture via USB.
 
 ## Thermostats - Températures (R36-R41)
 
-| Registre | Hex | Zone | Unité | Diviseur | Signé |
-|----------|-----|------|-------|----------|-------|
+> **Mapping RBUV** : Même logique que les consignes.
+
+| Registre | Hex | Zone RBUV | Unité | Diviseur | Signé |
+|----------|-----|-----------|-------|----------|-------|
 | 36 | 0x24 | Zone 1 | °C | ÷100 | Oui |
-| 37 | 0x25 | Zone 2 | °C | ÷100 | Oui |
-| 38 | 0x26 | Zone 3 | °C | ÷100 | Oui |
-| 39 | 0x27 | Zone 4 | °C | ÷100 | Oui |
-| 40 | 0x28 | Zone 5 | °C | ÷100 | Oui |
-| 41 | 0x29 | Zone 6 | °C | ÷100 | Oui |
+| 37 | 0x25 | Zone 1 bis | °C | ÷100 | Oui |
+| 38 | 0x26 | Zone 2 | °C | ÷100 | Oui |
+| 39 | 0x27 | Zone 3 | °C | ÷100 | Oui |
+| 40 | 0x28 | Zone 4 | °C | ÷100 | Oui |
+| 41 | 0x29 | Zone 5 | °C | ÷100 | Oui |
 
 ---
 
