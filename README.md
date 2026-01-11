@@ -102,7 +102,7 @@ Voir [esphome/README.md](esphome/README.md)
 
 | Document | Description |
 |----------|-------------|
-| [docs/registers.md](docs/registers.md) | Mapping des 34 registres Modbus |
+| [docs/registers.md](docs/registers.md) | Mapping des 40 registres Modbus |
 | [docs/protocol.md](docs/protocol.md) | Analyse du protocole 0x17 |
 | [docs/hardware.md](docs/hardware.md) | Schémas de câblage |
 | [docs/pi-zero-setup.md](docs/pi-zero-setup.md) | Guide Pi Zero |
@@ -115,7 +115,7 @@ Voir [esphome/README.md](esphome/README.md)
 
 | Fonctionnalité | Statut | Validé |
 |----------------|--------|--------|
-| Lecture registres (34) | ✅ Complété | ✅ 34/34 (2025-01-10) |
+| Lecture registres (40) | ✅ Complété | ✅ 40/40 (2025-01-11) |
 | Mapping TOUG vs RBUV | ✅ Complété | ✅ Validé par écran PAC |
 | Tests écriture USB | ✅ Complété | ✅ 8/10 (échecs attendus) |
 | Écriture mode PAC (0x17) | 🔄 En cours | ⚠️ À revalider |

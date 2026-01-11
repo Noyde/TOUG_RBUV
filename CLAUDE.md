@@ -49,7 +49,7 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 | 25 | Zone 5 |
 
 ## Statut projet
-- ✅ Lecture 34 registres via Pi Zero USB
+- ✅ Lecture 40 registres via Pi Zero USB
 - ✅ Protocole 0x17 documenté
 - ⚠️ Composant ESPHome à revalider
 - ⚠️ Projet BETA - utilisation à vos risques
@@ -73,7 +73,7 @@ TOUG_RBUV/
 │   ├── hardware.md              # Schémas de câblage matériel
 │   ├── pi-zero-setup.md         # Guide installation Raspberry Pi
 │   ├── protocol.md              # Documentation protocole 0x17
-│   └── registers.md             # Mapping des 34 registres Modbus
+│   └── registers.md             # Mapping des 40 registres Modbus
 ├── esphome/                     # Configuration ESPHome
 │   ├── README.md                # Guide ESPHome
 │   ├── aldes-tone-rbuv.yaml     # Configuration principale YAML
@@ -184,7 +184,7 @@ xxd /tmp/capture.bin | head -50
 
 ### `esphome/aldes-tone-rbuv.yaml`
 Configuration principale ESPHome. Définit :
-- Les 34 capteurs Modbus (températures, consignes, fréquences, etc.)
+- Les 40 capteurs Modbus (températures, consignes, fréquences, etc.)
 - Le sélecteur de mode PAC (Off, Chauffage Confort/Eco, Clim Confort/Boost, Vacances)
 - La configuration UART pour RS485 (GPIO16 RX, GPIO17 TX, GPIO4 flow control)
 
@@ -196,7 +196,7 @@ Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
 
 ### `tools/pac_aldes_mqtt.py`
 Script Python pour Raspberry Pi Zero :
-- Lecture des 34 registres via USB (lecture seule)
+- Lecture des 40 registres via USB (lecture seule)
 - Publication MQTT avec MQTT Discovery pour Home Assistant
 - Dictionnaire `REGISTERS` définissant tous les registres avec adresses et diviseurs
 
@@ -207,8 +207,8 @@ Documentation complète du protocole 0x17 :
 - Correspondance offset → registre Modbus
 
 ### `docs/registers.md`
-Mapping des 34 registres Modbus :
-- Registres système (R1, R3, R9)
+Mapping des 40 registres Modbus :
+- Registres système (R1, R3, R9, R14, R15, R51)
 - Consignes thermostats (R20-R25) - **lecture seule hardware**
 - Températures zones (R36-R41)
 - Ventilation, compresseur, EEV, débits/pressions
@@ -274,6 +274,7 @@ Messages préfixés :
 2. **Télécommande Aldes** : Doit être DÉBRANCHÉE pour utiliser l'ESP32. Collisions garanties sinon.
 3. **Écriture USB** : IMPOSSIBLE sur modèles 2018. Seul le bus RS485 accepte le protocole 0x17.
 4. **Registres TOUG 31100-31104** : Ne fonctionnent sur **aucun modèle** T.One (confirmé par @djtef). Erreur dans la doc TOUG.
+5. **Registres R16/R17 (Date/Heure)** : NON FONCTIONNELS sur RBUV via USB. Valeurs incohérentes lors de tests 2025-01-11.
 
 ---
 
