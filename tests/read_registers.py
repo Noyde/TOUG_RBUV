@@ -269,7 +269,7 @@ def test_registers(ser, registers_dict, group_name=""):
         })
 
         print(f"  R{addr:5d} | {info['name']:30s} | {value_str:20s} | {status}")
-        time.sleep(0.05)
+        time.sleep(0.2)  # 200ms minimum pour 1200 bauds
 
     return results
 
