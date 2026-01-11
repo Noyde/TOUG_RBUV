@@ -1,6 +1,6 @@
 # Registres Modbus - PAC Aldes T.One RBUV
 
-Documentation des registres Modbus accessibles en lecture via USB.
+Documentation des 40 registres Modbus accessibles en lecture via USB.
 
 > ⚠️ **Limitation modèle 2018** : L'écriture via USB retourne `illegal data address`. Seule la lecture est possible.
 
@@ -26,6 +26,11 @@ Documentation des registres Modbus accessibles en lecture via USB.
 | 1 | Version Firmware | - | 1 | |
 | 3 | Durée ON | min | 1 | Temps depuis dernier démarrage |
 | 9 | Mode PAC | - | 1 | Voir tableau modes |
+| 14 | Panel ID (bas) | - | 1 | ID panneau 16-bit bas |
+| 15 | Panel ID (haut) | - | 1 | ID panneau 16-bit haut |
+| 51 | Protection Compresseur | - | 1 | État protection |
+
+> **Note R16/R17** : Les registres Date/Heure encodées (R16/R17) ne sont PAS fonctionnels sur RBUV via USB. Tests 2025-01-11 : valeurs incohérentes.
 
 ### Modes PAC (Registre 9)
 
@@ -80,8 +85,11 @@ Documentation des registres Modbus accessibles en lecture via USB.
 
 | Registre | Nom | Unité | Diviseur | Notes |
 |----------|-----|-------|----------|-------|
+| 49 | Courant Compresseur | A | ÷100 | |
 | 65 | Consigne Fréquence | Hz | ÷10 | |
 | 66 | Fréquence Compresseur | Hz | ÷10 | |
+| 72 | Temps ON Compresseur (bas) | s | 1 | 32-bit (poids faible) |
+| 73 | Temps ON Compresseur (haut) | - | 1 | 32-bit (poids fort) |
 | 127 | Heures Compresseur | h | 1 | Compteur total |
 
 ---
