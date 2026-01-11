@@ -17,7 +17,7 @@
 #
 # ═══════════════════════════════════════════════════════════════
 
-# Noms des zones (personnalisables)
+# Noms des zones (personnalisables via secrets.yaml)
 substitutions:
   zone1_name: "Zone 1"
   zone1bis_name: "Zone 1 bis"
@@ -25,7 +25,13 @@ substitutions:
   zone3_name: "Zone 3"
   zone4_name: "Zone 4"
   zone5_name: "Zone 5"
-  zone6_name: "Zone 6"
+  # Noms des bouches (personnalisables)
+  bouche1a_name: "Bouche Zone 1a"
+  bouche1b_name: "Bouche Zone 1b"
+  bouche2_name: "Bouche Zone 2"
+  bouche3_name: "Bouche Zone 3"
+  bouche4_name: "Bouche Zone 4"
+  bouche5_name: "Bouche Zone 5"
 
 esphome:
   name: aldes-tone
@@ -140,7 +146,7 @@ select:
 
 binary_sensor:
   - platform: gpio
-    name: "Bouche Salon"
+    name: "${bouche1a_name}"
     id: bouche_k1a
     device_class: opening
     icon: "mdi:hvac"
@@ -152,7 +158,7 @@ binary_sensor:
       - delayed_off: 50000ms
 
   - platform: gpio
-    name: "Bouche Cuisine"
+    name: "${bouche1b_name}"
     id: bouche_k1b
     device_class: opening
     icon: "mdi:hvac"
@@ -164,7 +170,7 @@ binary_sensor:
       - delayed_off: 50000ms
 
   - platform: gpio
-    name: "Bouche Chambre Parentale"
+    name: "${bouche2_name}"
     id: bouche_k2
     device_class: opening
     icon: "mdi:hvac"
@@ -176,7 +182,7 @@ binary_sensor:
       - delayed_off: 50000ms
 
   - platform: gpio
-    name: "Bouche Bureau"
+    name: "${bouche3_name}"
     id: bouche_k3
     device_class: opening
     icon: "mdi:hvac"
@@ -188,7 +194,7 @@ binary_sensor:
       - delayed_off: 50000ms
 
   - platform: gpio
-    name: "Bouche Chambre Angèle"
+    name: "${bouche4_name}"
     id: bouche_k4
     device_class: opening
     icon: "mdi:hvac"
@@ -200,7 +206,7 @@ binary_sensor:
       - delayed_off: 50000ms
 
   - platform: gpio
-    name: "Bouche Chambre Marcus"
+    name: "${bouche5_name}"
     id: bouche_k5
     device_class: opening
     icon: "mdi:hvac"

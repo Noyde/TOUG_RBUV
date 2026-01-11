@@ -55,11 +55,19 @@ ota_password: ""
 
 # Noms des zones (personnalisables)
 zone1_name: "Zone 1"
+zone1bis_name: "Zone 1 bis"
 zone2_name: "Zone 2"
 zone3_name: "Zone 3"
 zone4_name: "Zone 4"
 zone5_name: "Zone 5"
-zone6_name: "Zone 6"
+
+# Noms des bouches (personnalisables)
+bouche1a_name: "Bouche Zone 1a"
+bouche1b_name: "Bouche Zone 1b"
+bouche2_name: "Bouche Zone 2"
+bouche3_name: "Bouche Zone 3"
+bouche4_name: "Bouche Zone 4"
+bouche5_name: "Bouche Zone 5"
 ```
 
 ### Explication des paramètres
@@ -71,13 +79,19 @@ zone6_name: "Zone 6"
 | `api_encryption_key` | Clé chiffrement API ESPHome (laisser vide pour désactiver) |
 | `ota_password` | Mot de passe pour mises à jour OTA (laisser vide pour désactiver) |
 | `zone1_name` | Nom Zone 1 (R20/R21 - même thermostat) |
+| `zone1bis_name` | Nom Zone 1 bis (même thermostat que Zone 1) |
 | `zone2_name` | Nom Zone 2 (R22) |
 | `zone3_name` | Nom Zone 3 (R23) |
 | `zone4_name` | Nom Zone 4 (R24) |
 | `zone5_name` | Nom Zone 5 (R25) |
-| `zone6_name` | Nom Zone 6 (R41 - température uniquement) |
+| `bouche1a_name` | Nom Bouche Zone 1a (GPIO34) |
+| `bouche1b_name` | Nom Bouche Zone 1b (GPIO35) |
+| `bouche2_name` | Nom Bouche Zone 2 (GPIO36) |
+| `bouche3_name` | Nom Bouche Zone 3 (GPIO39) |
+| `bouche4_name` | Nom Bouche Zone 4 (GPIO32) |
+| `bouche5_name` | Nom Bouche Zone 5 (GPIO33) |
 
-> **Note** : Le mapping RBUV utilise 5 thermostats : R20/R21 = même thermostat (Zone 1), R22-R25 = Zones 2-5. Zone 6 n'a que la température (R41).
+> **Note** : Le mapping RBUV utilise 5 thermostats : R20/R21 = même thermostat (Zone 1), R22-R25 = Zones 2-5.
 
 ### 3. Personnaliser les zones (optionnel)
 
