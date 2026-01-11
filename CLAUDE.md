@@ -85,7 +85,7 @@ TOUG_RBUV/
 │   ├── README.md                # Matrice de tests TOUG + RBUV
 │   └── results/                 # Résultats horodatés
 └── tools/                       # Scripts et services
-    ├── pac_aldes_mqtt.py        # Script Python Modbus→MQTT
+    ├── pac_aldes_mqtt_example.py # Script Python template (à copier en pac_aldes_mqtt.py)
     └── pac_aldes.service        # Service systemd
 ```
 
@@ -194,8 +194,8 @@ Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
 - Fonction `send_frame()` pour construire et envoyer les trames 74 bytes
 - Calcul CRC16 Modbus intégré
 
-### `tools/pac_aldes_mqtt.py`
-Script Python pour Raspberry Pi Zero :
+### `tools/pac_aldes_mqtt_example.py`
+Script Python template pour Raspberry Pi Zero (copier en `pac_aldes_mqtt.py` et configurer) :
 - Lecture des 40 registres via USB (lecture seule)
 - Publication MQTT avec MQTT Discovery pour Home Assistant
 - Dictionnaire `REGISTERS` définissant tous les registres avec adresses et diviseurs

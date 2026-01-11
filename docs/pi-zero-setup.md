@@ -137,9 +137,32 @@ Résultat attendu : `/dev/ttyACM1`
 
 ---
 
-## 5. Service systemd
+## 5. Installation du script
 
-### 5.1 Créer le fichier service
+### 5.1 Copier et configurer le script
+```bash
+# Télécharger le template depuis le repo
+wget https://raw.githubusercontent.com/Noyde/TOUG_RBUV/main/tools/pac_aldes_mqtt_example.py
+
+# Copier en script de production
+cp pac_aldes_mqtt_example.py pac_aldes_mqtt.py
+
+# Éditer et configurer vos credentials MQTT
+nano pac_aldes_mqtt.py
+```
+
+Modifier les 3 lignes de configuration :
+```python
+MQTT_BROKER = "192.168.x.x"      # IP de votre broker MQTT
+MQTT_USER = "votre_user"         # Utilisateur MQTT
+MQTT_PASSWORD = "votre_password" # Mot de passe MQTT
+```
+
+---
+
+## 6. Service systemd
+
+### 6.1 Créer le fichier service
 ```bash
 sudo nano /etc/systemd/system/pac_aldes.service
 ```
@@ -163,14 +186,14 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-### 5.2 Activer le service
+### 6.2 Activer le service
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable pac_aldes
 sudo systemctl start pac_aldes
 ```
 
-### 5.3 Commandes utiles
+### 6.3 Commandes utiles
 ```bash
 # Vérifier le statut
 sudo systemctl status pac_aldes
@@ -187,15 +210,15 @@ sudo systemctl stop pac_aldes
 
 ---
 
-## 6. Intégration Home Assistant
+## 7. Intégration Home Assistant
 
-### 6.1 MQTT Discovery
+### 7.1 MQTT Discovery
 
 Le script publie automatiquement la configuration MQTT Discovery. Les entités apparaissent dans :
 
 **Paramètres → Appareils et services → MQTT → PAC Aldes T.One AIR**
 
-### 6.2 Entités créées (41 total)
+### 7.2 Entités créées (41 total)
 
 | Catégorie | Nombre |
 |-----------|--------|
@@ -213,9 +236,9 @@ Le script publie automatiquement la configuration MQTT Discovery. Les entités a
 
 ---
 
-## 7. Dépannage
+## 8. Dépannage
 
-### 7.1 Problèmes courants
+### 8.1 Problèmes courants
 
 | Problème | Cause probable | Solution |
 |----------|----------------|----------|
@@ -225,7 +248,7 @@ Le script publie automatiquement la configuration MQTT Discovery. Les entités a
 | Valeurs aberrantes | Mauvais diviseur | Vérifier le script |
 | Service ne démarre pas | Mauvais chemin/utilisateur | Vérifier pac_aldes.service |
 
-### 7.2 Commandes de diagnostic
+### 8.2 Commandes de diagnostic
 ```bash
 # Vérifier le port série
 ls -la /dev/ttyACM* /dev/ttyUSB*
@@ -243,7 +266,7 @@ sudo journalctl -u pac_aldes -f
 python3 ~/pac_aldes_mqtt.py
 ```
 
-### 7.3 Rollback
+### 8.3 Rollback
 
 En cas de problème :
 1. Débrancher le Pi de la PAC
@@ -252,7 +275,7 @@ En cas de problème :
 
 ---
 
-## 8. Ressources
+## 9. Ressources
 
 | Ressource | Lien |
 |-----------|------|
