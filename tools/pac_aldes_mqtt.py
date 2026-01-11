@@ -77,7 +77,7 @@ def build_registers():
 
         # TEMPÉRATURES ZONES (6 registres) - Mapping RBUV
         "temp_zone1": {"address": 36, "name": f"Température {ZONES['zone1']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:home-thermometer", "signed": True},
-        "temp_zone1bis": {"address": 37, "name": f"Température Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone1bis": {"address": 37, "name": f"Température {ZONES['zone1']} bis", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
         "temp_zone2": {"address": 38, "name": f"Température {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:bed", "signed": True},
         "temp_zone3": {"address": 39, "name": f"Température {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:desk", "signed": True},
         "temp_zone4": {"address": 40, "name": f"Température {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
