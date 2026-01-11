@@ -167,11 +167,11 @@ nano config.json
   },
   "read_interval": 30,
   "zones": {
-    "zone1": "Salon",
-    "zone2": "Chambre 1",
-    "zone3": "Chambre 2",
-    "zone4": "Chambre 3",
-    "zone5": "Chambre 4"
+    "zone1": "Zone 1",
+    "zone2": "Zone 2",
+    "zone3": "Zone 3",
+    "zone4": "Zone 4",
+    "zone5": "Zone 5"
   }
 }
 ```
@@ -193,7 +193,7 @@ nano config.json
 | | `zone4` | Nom Zone 4 (R24) |
 | | `zone5` | Nom Zone 5 (R25) |
 
-> **Note** : Les noms de zones apparaîtront dans Home Assistant (ex: "Température Salon", "Consigne Chambre 1").
+> **Note** : Les noms de zones apparaîtront dans Home Assistant (ex: "Température Zone 1", "Consigne Zone 2").
 >
 > **Important** : Le mapping RBUV utilise 5 zones : R20/R21 = même thermostat (Zone 1), R22-R25 = Zones 2-5.
 
