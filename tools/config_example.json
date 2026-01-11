@@ -11,10 +11,10 @@
   },
   "read_interval": 30,
   "zones": {
-    "zone1": "Salon-Cuisine",
-    "zone2": "Chambre Parentale",
-    "zone3": "Bureau",
-    "zone4": "Chambre Angèle",
-    "zone5": "Chambre Marcus"
+    "zone1": "Zone 1",
+    "zone2": "Zone 2",
+    "zone3": "Zone 3",
+    "zone4": "Zone 4",
+    "zone5": "Zone 5"
   }
 }
