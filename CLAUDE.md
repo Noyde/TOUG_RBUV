@@ -85,8 +85,9 @@ TOUG_RBUV/
 │   ├── README.md                # Matrice de tests TOUG + RBUV
 │   └── results/                 # Résultats horodatés
 └── tools/                       # Scripts et services
-    ├── pac_aldes_mqtt_example.py # Script Python template (à copier en pac_aldes_mqtt.py)
-    └── pac_aldes.service        # Service systemd
+    ├── pac_aldes_mqtt.py         # Script Python Modbus→MQTT
+    ├── config_example.json        # Config exemple (copier en config.json)
+    └── pac_aldes.service          # Service systemd
 ```
 
 ---
@@ -194,11 +195,17 @@ Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
 - Fonction `send_frame()` pour construire et envoyer les trames 74 bytes
 - Calcul CRC16 Modbus intégré
 
-### `tools/pac_aldes_mqtt_example.py`
-Script Python template pour Raspberry Pi Zero (copier en `pac_aldes_mqtt.py` et configurer) :
+### `tools/pac_aldes_mqtt.py`
+Script Python pour Raspberry Pi Zero. Configuration via `config.json` :
 - Lecture des 40 registres via USB (lecture seule)
 - Publication MQTT avec MQTT Discovery pour Home Assistant
-- Dictionnaire `REGISTERS` définissant tous les registres avec adresses et diviseurs
+- Noms de zones personnalisables via config.json
+
+### `tools/config_example.json`
+Fichier de configuration exemple (copier en `config.json`) :
+- Credentials MQTT (broker, user, password)
+- Port série et baudrate
+- Noms des 6 zones (personnalisables)
 
 ### `docs/protocol.md`
 Documentation complète du protocole 0x17 :

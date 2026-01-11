@@ -139,24 +139,45 @@ Résultat attendu : `/dev/ttyACM1`
 
 ## 5. Installation du script
 
-### 5.1 Copier et configurer le script
+### 5.1 Télécharger le script et la config
 ```bash
-# Télécharger le template depuis le repo
-wget https://raw.githubusercontent.com/Noyde/TOUG_RBUV/main/tools/pac_aldes_mqtt_example.py
+# Télécharger le script et le fichier config exemple
+wget https://raw.githubusercontent.com/Noyde/TOUG_RBUV/main/tools/pac_aldes_mqtt.py
+wget https://raw.githubusercontent.com/Noyde/TOUG_RBUV/main/tools/config_example.json
 
-# Copier en script de production
-cp pac_aldes_mqtt_example.py pac_aldes_mqtt.py
+# Créer votre fichier de configuration
+cp config_example.json config.json
 
-# Éditer et configurer vos credentials MQTT
-nano pac_aldes_mqtt.py
+# Éditer la configuration
+nano config.json
 ```
 
-Modifier les 3 lignes de configuration :
-```python
-MQTT_BROKER = "192.168.x.x"      # IP de votre broker MQTT
-MQTT_USER = "votre_user"         # Utilisateur MQTT
-MQTT_PASSWORD = "votre_password" # Mot de passe MQTT
+### 5.2 Configurer config.json
+```json
+{
+  "mqtt": {
+    "broker": "192.168.x.x",
+    "port": 1883,
+    "user": "votre_user",
+    "password": "votre_password"
+  },
+  "serial": {
+    "port": "/dev/ttyACM1",
+    "baudrate": 1200
+  },
+  "read_interval": 30,
+  "zones": {
+    "zone1": "Salon",
+    "zone2": "Chambre 1",
+    "zone3": "Chambre 2",
+    "zone4": "Bureau",
+    "zone5": "Chambre 3",
+    "zone6": "Zone 6"
+  }
+}
 ```
+
+> **Note** : Les noms de zones apparaîtront dans Home Assistant (ex: "Température Salon", "Consigne Bureau").
 
 ---
 

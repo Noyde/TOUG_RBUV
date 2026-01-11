@@ -1,0 +1,21 @@
+{
+  "mqtt": {
+    "broker": "192.168.x.x",
+    "port": 1883,
+    "user": "votre_user",
+    "password": "votre_password"
+  },
+  "serial": {
+    "port": "/dev/ttyACM1",
+    "baudrate": 1200
+  },
+  "read_interval": 30,
+  "zones": {
+    "zone1": "Zone 1",
+    "zone2": "Zone 2",
+    "zone3": "Zone 3",
+    "zone4": "Zone 4",
+    "zone5": "Zone 5",
+    "zone6": "Zone 6"
+  }
+}
