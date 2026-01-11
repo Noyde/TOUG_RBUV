@@ -176,9 +176,26 @@ nano config.json
 }
 ```
 
+### 5.3 Explication des paramètres
+
+| Section | Paramètre | Description |
+|---------|-----------|-------------|
+| **mqtt** | `broker` | Adresse IP de votre serveur MQTT (Home Assistant) |
+| | `port` | Port MQTT (1883 par défaut) |
+| | `user` | Utilisateur MQTT |
+| | `password` | Mot de passe MQTT |
+| **serial** | `port` | Port série USB (`/dev/ttyACM1` généralement) |
+| | `baudrate` | Vitesse communication (toujours `1200` pour RBUV) |
+| **read_interval** | | Intervalle de lecture en secondes (30 recommandé) |
+| **zones** | `zone1` | Nom Zone 1 (R20/R21 - même thermostat) |
+| | `zone2` | Nom Zone 2 (R22) |
+| | `zone3` | Nom Zone 3 (R23) |
+| | `zone4` | Nom Zone 4 (R24) |
+| | `zone5` | Nom Zone 5 (R25) |
+
 > **Note** : Les noms de zones apparaîtront dans Home Assistant (ex: "Température Salon", "Consigne Chambre 1").
 >
-> **Important** : Le mapping RBUV est R20/R21 = même thermostat (Zone 1), R22=Zone2, R23=Zone3, R24=Zone4, R25=Zone5.
+> **Important** : Le mapping RBUV utilise 5 zones : R20/R21 = même thermostat (Zone 1), R22-R25 = Zones 2-5.
 
 ---
 
