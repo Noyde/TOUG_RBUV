@@ -6,13 +6,16 @@ Pour Raspberry Pi Zero W
 Projet TOUG_RBUV - Complément au projet TOUG de @djtef
 https://github.com/djtef/toug
 
-Version: 4.1
+Version: 4.2
 Licence: MIT
 
 Communication USB: 1200 bauds, 8 bits, parité EVEN, 1 stop bit
 
 NOTE: Ce script permet uniquement la LECTURE des registres.
 L'écriture n'est pas possible via USB sur les modèles RBUV 2018.
+
+CHANGELOG v4.2:
+- Ajout capteur "Mode PAC (Texte)" pour afficher Chauffage/Rafraîchissement/Off
 
 CHANGELOG v4.1:
 - 40 registres (R16/R17 retirés - non fonctionnels sur RBUV)
@@ -213,7 +216,7 @@ def publish_discovery(mqtt_client):
         "name": "PAC Aldes T.One AIR",
         "manufacturer": "Aldes",
         "model": "T.One AIR RBUV",
-        "sw_version": "TOUG_RBUV 4.1"
+        "sw_version": "TOUG_RBUV 4.2"
     }
 
     for key, reg in REGISTERS.items():
@@ -235,7 +238,18 @@ def publish_discovery(mqtt_client):
         topic = f"{MQTT_BASE_TOPIC}/sensor/pac_aldes_{key}/config"
         mqtt_client.publish(topic, json.dumps(config), retain=True)
 
-    logging.info(f"📢 MQTT Discovery publié ({len(REGISTERS)} entités)")
+    # Capteur mode_text (texte lisible du mode PAC)
+    mode_text_config = {
+        "name": "Mode PAC (Texte)",
+        "unique_id": "pac_aldes_mode_text",
+        "state_topic": f"{MQTT_STATE_TOPIC}/state",
+        "value_template": "{{ value_json.mode_text }}",
+        "device": device_info,
+        "icon": "mdi:hvac",
+    }
+    mqtt_client.publish(f"{MQTT_BASE_TOPIC}/sensor/pac_aldes_mode_text/config", json.dumps(mode_text_config), retain=True)
+
+    logging.info(f"📢 MQTT Discovery publié ({len(REGISTERS) + 1} entités)")
 
 def publish_values(mqtt_client, values):
     """Publier les valeurs sur MQTT"""
@@ -274,9 +288,9 @@ def main():
 
     print(f"""
 ╔══════════════════════════════════════════════════════════════╗
-║     TOUG_RBUV - Aldes T.One AIR Modbus Reader v4.1           ║
+║     TOUG_RBUV - Aldes T.One AIR Modbus Reader v4.2           ║
 ║     Raspberry Pi USB → MQTT → Home Assistant                 ║
-║     40 registres (R16/R17 retirés - non fonctionnels RBUV)   ║
+║     40 registres + Mode PAC (Texte)                          ║
 ╚══════════════════════════════════════════════════════════════╝
     """)
 
