@@ -66,21 +66,22 @@ def build_registers():
         "panel_id_haut": {"address": 15, "name": "Panel ID (haut)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
         "protection_compresseur": {"address": 51, "name": "Protection Compresseur", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:shield"},
 
-        # CONSIGNES THERMOSTATS (6 registres)
+        # CONSIGNES THERMOSTATS (6 registres) - Mapping RBUV
+        # R20/R21 = même thermostat (Zone 1), R22=Zone2, R23=Zone3, R24=Zone4, R25=Zone5
         "consigne_zone1": {"address": 20, "name": f"Consigne {ZONES['zone1']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone2": {"address": 21, "name": f"Consigne {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone3": {"address": 22, "name": f"Consigne {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone4": {"address": 23, "name": f"Consigne {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone5": {"address": 24, "name": f"Consigne {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone6": {"address": 25, "name": f"Consigne {ZONES['zone6']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone1bis": {"address": 21, "name": f"Consigne {ZONES['zone1']} bis", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone2": {"address": 22, "name": f"Consigne {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone3": {"address": 23, "name": f"Consigne {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone4": {"address": 24, "name": f"Consigne {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone5": {"address": 25, "name": f"Consigne {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
 
-        # TEMPÉRATURES ZONES (6 registres)
+        # TEMPÉRATURES ZONES (6 registres) - Mapping RBUV
         "temp_zone1": {"address": 36, "name": f"Température {ZONES['zone1']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:home-thermometer", "signed": True},
-        "temp_zone2": {"address": 37, "name": f"Température {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:bed", "signed": True},
-        "temp_zone3": {"address": 38, "name": f"Température {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:desk", "signed": True},
-        "temp_zone4": {"address": 39, "name": f"Température {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
-        "temp_zone5": {"address": 40, "name": f"Température {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
-        "temp_zone6": {"address": 41, "name": f"Température {ZONES['zone6']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone1bis": {"address": 37, "name": f"Température Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone2": {"address": 38, "name": f"Température {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:bed", "signed": True},
+        "temp_zone3": {"address": 39, "name": f"Température {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:desk", "signed": True},
+        "temp_zone4": {"address": 40, "name": f"Température {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone5": {"address": 41, "name": f"Température {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
 
         # COMPRESSEUR (6 registres)
         "courant_compresseur": {"address": 49, "name": "Courant Compresseur", "unit": "A", "divisor": 100, "device_class": "current", "icon": "mdi:current-ac"},
@@ -229,13 +230,74 @@ def publish_values(mqtt_client, values):
     logging.info(f"📤 Valeurs publiées ({len(filtered)} registres)")
 
 def print_status(values):
+    """Afficher toutes les entités dans le journal"""
+
+    # SYSTÈME
+    logging.info("═══ SYSTÈME ═══")
+    if values.get("version") is not None:
+        logging.info(f"  Version Firmware: {int(values['version'])}")
     if values.get("mode") is not None:
-        mode = MODE_PAC.get(int(values["mode"]), "Inconnu")
+        mode = MODE_PAC.get(int(values["mode"]), f"Inconnu ({int(values['mode'])})")
         logging.info(f"  Mode PAC: {mode}")
-    if values.get("temp_exterieure") is not None:
-        logging.info(f"  T° Extérieure: {values['temp_exterieure']:.1f}°C")
+    if values.get("duree_on") is not None:
+        logging.info(f"  Durée ON: {int(values['duree_on'])} min")
+    if values.get("protection_compresseur") is not None:
+        logging.info(f"  Protection Compresseur: {int(values['protection_compresseur'])}")
+
+    # CONSIGNES
+    logging.info("═══ CONSIGNES ═══")
+    for key in ["consigne_zone1", "consigne_zone1bis", "consigne_zone2", "consigne_zone3", "consigne_zone4", "consigne_zone5"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # TEMPÉRATURES ZONES
+    logging.info("═══ TEMPÉRATURES ZONES ═══")
+    for key in ["temp_zone1", "temp_zone1bis", "temp_zone2", "temp_zone3", "temp_zone4", "temp_zone5"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # TEMPÉRATURES PAC
+    logging.info("═══ TEMPÉRATURES PAC ═══")
+    for key in ["temp_exterieure", "temp_air_repris", "temp_echangeur_ui", "temp_echangeur_ue", "temp_sortie_compresseur"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # COMPRESSEUR
+    logging.info("═══ COMPRESSEUR ═══")
     if values.get("freq_compresseur") is not None:
         logging.info(f"  Fréquence: {values['freq_compresseur']:.1f} Hz")
+    if values.get("consigne_freq") is not None:
+        logging.info(f"  Consigne Fréquence: {values['consigne_freq']:.1f} Hz")
+    if values.get("courant_compresseur") is not None:
+        logging.info(f"  Courant: {values['courant_compresseur']:.2f} A")
+    if values.get("heures_compresseur") is not None:
+        logging.info(f"  Heures: {int(values['heures_compresseur'])} h")
+
+    # VENTILATION
+    logging.info("═══ VENTILATION ═══")
+    if values.get("vitesse_ventilateur") is not None:
+        logging.info(f"  Vitesse: {int(values['vitesse_ventilateur'])} rpm")
+    if values.get("consigne_ventilateur") is not None:
+        logging.info(f"  Consigne: {int(values['consigne_ventilateur'])} rpm")
+    if values.get("heures_ventilateur") is not None:
+        logging.info(f"  Heures: {int(values['heures_ventilateur'])} h")
+
+    # EEV
+    logging.info("═══ EEV ═══")
+    if values.get("eev1") is not None:
+        logging.info(f"  EEV1: {int(values['eev1'])} Pls")
+    if values.get("eev2") is not None:
+        logging.info(f"  EEV2: {int(values['eev2'])} Pls")
+
+    # DÉBITS/PRESSIONS
+    logging.info("═══ DÉBITS/PRESSIONS ═══")
+    if values.get("debit_nominal") is not None:
+        logging.info(f"  Débit Nominal: {int(values['debit_nominal'])} m³/h")
+    if values.get("pression_statique_ext") is not None:
+        logging.info(f"  Pression Statique: {int(values['pression_statique_ext'])} Pa")
 
 # =============================================================================
 # MAIN
