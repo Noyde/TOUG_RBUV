@@ -230,13 +230,74 @@ def publish_values(mqtt_client, values):
     logging.info(f"📤 Valeurs publiées ({len(filtered)} registres)")
 
 def print_status(values):
+    """Afficher toutes les entités dans le journal"""
+
+    # SYSTÈME
+    logging.info("═══ SYSTÈME ═══")
+    if values.get("version") is not None:
+        logging.info(f"  Version Firmware: {int(values['version'])}")
     if values.get("mode") is not None:
-        mode = MODE_PAC.get(int(values["mode"]), "Inconnu")
+        mode = MODE_PAC.get(int(values["mode"]), f"Inconnu ({int(values['mode'])})")
         logging.info(f"  Mode PAC: {mode}")
-    if values.get("temp_exterieure") is not None:
-        logging.info(f"  T° Extérieure: {values['temp_exterieure']:.1f}°C")
+    if values.get("duree_on") is not None:
+        logging.info(f"  Durée ON: {int(values['duree_on'])} min")
+    if values.get("protection_compresseur") is not None:
+        logging.info(f"  Protection Compresseur: {int(values['protection_compresseur'])}")
+
+    # CONSIGNES
+    logging.info("═══ CONSIGNES ═══")
+    for key in ["consigne_zone1", "consigne_zone1bis", "consigne_zone2", "consigne_zone3", "consigne_zone4", "consigne_zone5"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # TEMPÉRATURES ZONES
+    logging.info("═══ TEMPÉRATURES ZONES ═══")
+    for key in ["temp_zone1", "temp_zone1bis", "temp_zone2", "temp_zone3", "temp_zone4", "temp_zone5"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # TEMPÉRATURES PAC
+    logging.info("═══ TEMPÉRATURES PAC ═══")
+    for key in ["temp_exterieure", "temp_air_repris", "temp_echangeur_ui", "temp_echangeur_ue", "temp_sortie_compresseur"]:
+        if values.get(key) is not None:
+            name = REGISTERS[key]["name"]
+            logging.info(f"  {name}: {values[key]:.1f}°C")
+
+    # COMPRESSEUR
+    logging.info("═══ COMPRESSEUR ═══")
     if values.get("freq_compresseur") is not None:
         logging.info(f"  Fréquence: {values['freq_compresseur']:.1f} Hz")
+    if values.get("consigne_freq") is not None:
+        logging.info(f"  Consigne Fréquence: {values['consigne_freq']:.1f} Hz")
+    if values.get("courant_compresseur") is not None:
+        logging.info(f"  Courant: {values['courant_compresseur']:.2f} A")
+    if values.get("heures_compresseur") is not None:
+        logging.info(f"  Heures: {int(values['heures_compresseur'])} h")
+
+    # VENTILATION
+    logging.info("═══ VENTILATION ═══")
+    if values.get("vitesse_ventilateur") is not None:
+        logging.info(f"  Vitesse: {int(values['vitesse_ventilateur'])} rpm")
+    if values.get("consigne_ventilateur") is not None:
+        logging.info(f"  Consigne: {int(values['consigne_ventilateur'])} rpm")
+    if values.get("heures_ventilateur") is not None:
+        logging.info(f"  Heures: {int(values['heures_ventilateur'])} h")
+
+    # EEV
+    logging.info("═══ EEV ═══")
+    if values.get("eev1") is not None:
+        logging.info(f"  EEV1: {int(values['eev1'])} Pls")
+    if values.get("eev2") is not None:
+        logging.info(f"  EEV2: {int(values['eev2'])} Pls")
+
+    # DÉBITS/PRESSIONS
+    logging.info("═══ DÉBITS/PRESSIONS ═══")
+    if values.get("debit_nominal") is not None:
+        logging.info(f"  Débit Nominal: {int(values['debit_nominal'])} m³/h")
+    if values.get("pression_statique_ext") is not None:
+        logging.info(f"  Pression Statique: {int(values['pression_statique_ext'])} Pa")
 
 # =============================================================================
 # MAIN
