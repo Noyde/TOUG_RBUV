@@ -420,6 +420,8 @@ Groupes: system, consignes, temperatures, ventilation, compresseur, pac, eev, de
             timeout=TIMEOUT
         )
         print(f"✅ Port série ouvert: {args.port} @ {BAUDRATE} bauds")
+        time.sleep(1)  # Stabilisation connexion USB
+        ser.reset_input_buffer()
     except Exception as e:
         print(f"❌ Erreur ouverture port série: {e}")
         sys.exit(1)
