@@ -42,7 +42,7 @@ Guide d'installation pour la lecture Modbus de la PAC Aldes T.One RBUV via Pi Ze
 │   Home Assistant        │
 │                         │
 │   - MQTT Discovery      │
-│   - 34 entités          │
+│   - 41 entités          │
 │   - Dashboard PAC       │
 └─────────────────────────┘
 ```
@@ -195,18 +195,21 @@ Le script publie automatiquement la configuration MQTT Discovery. Les entités a
 
 **Paramètres → Appareils et services → MQTT → PAC Aldes T.One AIR**
 
-### 6.2 Entités créées (34 total)
+### 6.2 Entités créées (41 total)
 
 | Catégorie | Nombre |
 |-----------|--------|
 | Températures pièces | 6 |
 | Consignes | 6 |
 | Températures PAC | 5 |
-| Compresseur | 3 |
+| Compresseur | 6 |
 | Ventilation | 4 |
 | EEV | 2 |
 | Débits/Pressions | 5 |
-| Système | 3 |
+| Système | 6 |
+| Mode PAC (Texte) | 1 |
+
+> **Note** : R16/R17 (Date/Heure) non inclus - non fonctionnels sur RBUV via USB.
 
 ---
 
