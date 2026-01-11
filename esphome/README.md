@@ -47,8 +47,13 @@ Contenu de `secrets.yaml` :
 wifi_ssid: "VotreSSID"
 wifi_password: "VotreMotDePasse"
 
+# API ESPHome (optionnel)
+api_encryption_key: ""
+
+# OTA (optionnel)
+ota_password: ""
+
 # Noms des zones (personnalisables)
-# Note: zone1 correspond à R20/R21 (même thermostat)
 zone1_name: "Zone 1"
 zone2_name: "Zone 2"
 zone3_name: "Zone 3"
@@ -56,6 +61,23 @@ zone4_name: "Zone 4"
 zone5_name: "Zone 5"
 zone6_name: "Zone 6"
 ```
+
+### Explication des paramètres
+
+| Paramètre | Description |
+|-----------|-------------|
+| `wifi_ssid` | Nom de votre réseau WiFi |
+| `wifi_password` | Mot de passe WiFi |
+| `api_encryption_key` | Clé chiffrement API ESPHome (laisser vide pour désactiver) |
+| `ota_password` | Mot de passe pour mises à jour OTA (laisser vide pour désactiver) |
+| `zone1_name` | Nom Zone 1 (R20/R21 - même thermostat) |
+| `zone2_name` | Nom Zone 2 (R22) |
+| `zone3_name` | Nom Zone 3 (R23) |
+| `zone4_name` | Nom Zone 4 (R24) |
+| `zone5_name` | Nom Zone 5 (R25) |
+| `zone6_name` | Nom Zone 6 (R41 - température uniquement) |
+
+> **Note** : Le mapping RBUV utilise 5 thermostats : R20/R21 = même thermostat (Zone 1), R22-R25 = Zones 2-5. Zone 6 n'a que la température (R41).
 
 ### 3. Personnaliser les zones (optionnel)
 
