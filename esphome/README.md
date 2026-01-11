@@ -8,6 +8,8 @@ Configuration ESPHome pour les PAC Aldes T.One RBUV (modèles 2018 et antérieur
 ```
 esphome/
 ├── aldes-tone-rbuv.yaml          # Configuration principale
+├── secrets_example.yaml          # Exemple de configuration secrets
+├── secrets.yaml                  # Vos secrets (gitignore)
 ├── components/
 │   └── aldes_tone/
 │       ├── __init__.py           # Définition composant Python
@@ -31,17 +33,36 @@ Copiez le contenu de ce dossier dans votre configuration ESPHome :
         └── aldes_tone.h
 ```
 
-### 2. Configurer le WiFi
+### 2. Configurer secrets.yaml
 
-Créez ou modifiez `secrets.yaml` :
-```yaml
-wifi_ssid: "Votre_SSID"
-wifi_password: "Votre_Mot_De_Passe"
+Copiez l'exemple et configurez vos valeurs :
+```bash
+cp secrets_example.yaml secrets.yaml
+nano secrets.yaml
 ```
 
-### 3. Adapter les noms de zones
+Contenu de `secrets.yaml` :
+```yaml
+# WiFi
+wifi_ssid: "VotreSSID"
+wifi_password: "VotreMotDePasse"
 
-Dans `aldes-tone-rbuv.yaml`, remplacez "Zone 1", "Zone 2", etc. par vos pièces.
+# Noms des zones (personnalisables)
+zone1_name: "Salon-Cuisine"
+zone2_name: "Chambre Parentale"
+zone3_name: "Bureau"
+zone4_name: "Chambre Angèle"
+zone5_name: "Chambre Marcus"
+zone6_name: "Zone 6"
+```
+
+### 3. Personnaliser les zones (optionnel)
+
+Les noms de zones sont définis dans la section `substitutions` du YAML.
+Vous pouvez les modifier directement ou les surcharger à la compilation :
+```bash
+esphome -s zone1_name "Mon Salon" run aldes-tone-rbuv.yaml
+```
 
 ### 4. Compiler et flasher
 ```bash

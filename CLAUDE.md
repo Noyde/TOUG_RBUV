@@ -77,6 +77,7 @@ TOUG_RBUV/
 ├── esphome/                     # Configuration ESPHome
 │   ├── README.md                # Guide ESPHome
 │   ├── aldes-tone-rbuv.yaml     # Configuration principale YAML
+│   ├── secrets_example.yaml     # Exemple secrets (copier en secrets.yaml)
 │   └── components/              # Composant custom ESPHome
 │       └── aldes_tone/
 │           ├── __init__.py      # Définition composant Python
@@ -188,6 +189,12 @@ Configuration principale ESPHome. Définit :
 - Les 40 capteurs Modbus (températures, consignes, fréquences, etc.)
 - Le sélecteur de mode PAC (Off, Chauffage Confort/Eco, Clim Confort/Boost, Vacances)
 - La configuration UART pour RS485 (GPIO16 RX, GPIO17 TX, GPIO4 flow control)
+- Noms de zones personnalisables via substitutions
+
+### `esphome/secrets_example.yaml`
+Fichier de configuration exemple (copier en `secrets.yaml`) :
+- Credentials WiFi (ssid, password)
+- Noms des 6 zones (personnalisables)
 
 ### `esphome/components/aldes_tone/aldes_tone.h`
 Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
