@@ -230,6 +230,55 @@ sensor:
     value_type: U_WORD
     unit_of_measurement: "min"
 
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Panel ID (bas)"
+    disabled_by_default: true
+    entity_category: diagnostic
+    icon: mdi:identifier
+    register_type: holding
+    address: 0x0E
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Panel ID (haut)"
+    disabled_by_default: true
+    entity_category: diagnostic
+    icon: mdi:identifier
+    register_type: holding
+    address: 0x0F
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Date Encodée"
+    disabled_by_default: true
+    entity_category: diagnostic
+    icon: mdi:calendar
+    register_type: holding
+    address: 0x10
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Heure Encodée"
+    disabled_by_default: true
+    entity_category: diagnostic
+    icon: mdi:clock
+    register_type: holding
+    address: 0x11
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Protection Compresseur"
+    entity_category: diagnostic
+    icon: mdi:shield
+    register_type: holding
+    address: 0x33
+    value_type: U_WORD
+
 # ═══════════════════════════════════════════════════════════════
 # SENSORS - Consignes (LECTURE SEULE - pilotées par thermostats radio)
 # MAPPING v3.0 : R20=Salon-Cuisine, R22=Parentale, R23=Bureau, R24=Angèle, R25=Marcus
@@ -241,6 +290,18 @@ sensor:
     icon: "mdi:thermostat"
     register_type: holding
     address: 0x14
+    value_type: U_WORD
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Consigne Zone 1 bis"
+    icon: "mdi:thermostat"
+    register_type: holding
+    address: 0x15
     value_type: U_WORD
     unit_of_measurement: "°C"
     accuracy_decimals: 1
@@ -307,6 +368,19 @@ sensor:
     state_class: "measurement"
     register_type: holding
     address: 0x24
+    value_type: S_WORD
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Température Zone 2"
+    device_class: "temperature"
+    state_class: "measurement"
+    register_type: holding
+    address: 0x25
     value_type: S_WORD
     unit_of_measurement: "°C"
     accuracy_decimals: 1
@@ -461,9 +535,54 @@ sensor:
     value_type: U_WORD
     unit_of_measurement: "rpm"
 
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Niveau Ventilation UE"
+    entity_category: diagnostic
+    icon: mdi:fan-speed-1
+    register_type: holding
+    address: 0x6A
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Heures Ventilateur"
+    entity_category: diagnostic
+    icon: mdi:clock-outline
+    register_type: holding
+    address: 0x7D
+    value_type: U_WORD
+    unit_of_measurement: "h"
+
 # ═══════════════════════════════════════════════════════════════
 # SENSORS - Compresseur
 # ═══════════════════════════════════════════════════════════════
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Courant Compresseur"
+    entity_category: diagnostic
+    icon: mdi:current-ac
+    register_type: holding
+    address: 0x31
+    value_type: U_WORD
+    unit_of_measurement: "A"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Consigne Fréquence Compresseur"
+    entity_category: diagnostic
+    icon: mdi:sine-wave
+    register_type: holding
+    address: 0x41
+    value_type: U_WORD
+    unit_of_measurement: "Hz"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
 
   - platform: modbus_controller
     modbus_controller_id: aldes
@@ -477,6 +596,25 @@ sensor:
     accuracy_decimals: 1
     filters:
       - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Temps ON Compresseur (bas)"
+    entity_category: diagnostic
+    icon: mdi:timer
+    register_type: holding
+    address: 0x48
+    value_type: U_WORD
+    unit_of_measurement: "s"
+
+  - platform: modbus_controller
+    modbus_controller_id: aldes
+    name: "Temps ON Compresseur (haut)"
+    entity_category: diagnostic
+    icon: mdi:timer
+    register_type: holding
+    address: 0x49
+    value_type: U_WORD
 
   - platform: modbus_controller
     modbus_controller_id: aldes
