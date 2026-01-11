@@ -53,14 +53,14 @@ REGISTERS = {
         25: {"name": "Consigne Zone 5", "unit": "°C", "divisor": 100, "signed": False},
     },
 
-    # Températures zones
+    # Températures zones (mapping RBUV : R36/R37 = même thermostat Zone 1)
     "temperatures": {
         36: {"name": "Température Zone 1", "unit": "°C", "divisor": 100, "signed": True},
-        37: {"name": "Température Zone 2", "unit": "°C", "divisor": 100, "signed": True},
-        38: {"name": "Température Zone 3", "unit": "°C", "divisor": 100, "signed": True},
-        39: {"name": "Température Zone 4", "unit": "°C", "divisor": 100, "signed": True},
-        40: {"name": "Température Zone 5", "unit": "°C", "divisor": 100, "signed": True},
-        41: {"name": "Température Zone 6", "unit": "°C", "divisor": 100, "signed": True},
+        37: {"name": "Température Zone 1 bis", "unit": "°C", "divisor": 100, "signed": True},
+        38: {"name": "Température Zone 2", "unit": "°C", "divisor": 100, "signed": True},
+        39: {"name": "Température Zone 3", "unit": "°C", "divisor": 100, "signed": True},
+        40: {"name": "Température Zone 4", "unit": "°C", "divisor": 100, "signed": True},
+        41: {"name": "Température Zone 5", "unit": "°C", "divisor": 100, "signed": True},
     },
 
     # Ventilation
