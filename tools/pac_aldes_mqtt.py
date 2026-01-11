@@ -6,13 +6,23 @@ Pour Raspberry Pi Zero W
 Projet TOUG_RBUV - Complément au projet TOUG de @djtef
 https://github.com/djtef/toug
 
-Version: 1.0
+Version: 4.1
 Licence: MIT
 
 Communication USB: 1200 bauds, 8 bits, parité EVEN, 1 stop bit
 
 NOTE: Ce script permet uniquement la LECTURE des registres.
 L'écriture n'est pas possible via USB sur les modèles RBUV 2018.
+
+CHANGELOG v4.1:
+- 40 registres (R16/R17 retirés - non fonctionnels sur RBUV)
+- R16/R17 (Date/Heure) ne sont pas accessibles via USB sur RBUV
+
+CHANGELOG v4.0:
+- 42 registres complets (tous testés USB 2025-01-10)
+- Ajout R14-R15 (Panel ID)
+- Ajout R49 (Courant compresseur), R51 (Protection)
+- Ajout R72-R73 (Temps ON compresseur 32-bit)
 """
 
 import time
@@ -42,31 +52,34 @@ MODBUS_ADDRESS = 0x01
 READ_INTERVAL = 30
 
 # =============================================================================
-# REGISTRES MODBUS - Mapping T.One AIR RBUV (modèles 2018)
+# REGISTRES MODBUS - 40 registres (R16/R17 retirés - non fonctionnels RBUV)
 # Adaptez les noms de zones à votre installation
 # =============================================================================
 
 REGISTERS = {
     # =========================================================================
-    # SYSTÈME
+    # SYSTÈME (6 registres) - R16/R17 retirés (Date/Heure non accessibles USB)
     # =========================================================================
     "version": {"address": 1, "name": "Version Firmware", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:information-outline"},
     "duree_on": {"address": 3, "name": "Durée ON", "unit": "min", "divisor": 1, "device_class": "duration", "icon": "mdi:clock-outline"},
     "mode": {"address": 9, "name": "Mode PAC", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:hvac"},
+    "panel_id_bas": {"address": 14, "name": "Panel ID (bas)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
+    "panel_id_haut": {"address": 15, "name": "Panel ID (haut)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
+    "protection_compresseur": {"address": 51, "name": "Protection Compresseur", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:shield"},
 
     # =========================================================================
-    # THERMOSTATS - CONSIGNES (R20-R25)
+    # THERMOSTATS - CONSIGNES (R20-R25) - 6 zones
     # Note: Adaptez les noms à vos pièces
     # =========================================================================
     "consigne_zone1": {"address": 20, "name": "Consigne Zone 1", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-    "consigne_zone2": {"address": 21, "name": "Consigne Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-    "consigne_zone3": {"address": 22, "name": "Consigne Zone 3", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-    "consigne_zone4": {"address": 23, "name": "Consigne Zone 4", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-    "consigne_zone5": {"address": 24, "name": "Consigne Zone 5", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-    "consigne_zone6": {"address": 25, "name": "Consigne Zone 6", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+    "consigne_zone1_bis": {"address": 21, "name": "Consigne Zone 1 bis", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+    "consigne_zone2": {"address": 22, "name": "Consigne Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+    "consigne_zone3": {"address": 23, "name": "Consigne Zone 3", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+    "consigne_zone4": {"address": 24, "name": "Consigne Zone 4", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+    "consigne_zone5": {"address": 25, "name": "Consigne Zone 5", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
 
     # =========================================================================
-    # THERMOSTATS - TEMPÉRATURES (R36-R41)
+    # THERMOSTATS - TEMPÉRATURES (R36-R41) - 6 zones
     # =========================================================================
     "temp_zone1": {"address": 36, "name": "Température Zone 1", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
     "temp_zone2": {"address": 37, "name": "Température Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
@@ -76,22 +89,25 @@ REGISTERS = {
     "temp_zone6": {"address": 41, "name": "Température Zone 6", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
 
     # =========================================================================
-    # VENTILATION
+    # VENTILATION (4 registres)
     # =========================================================================
     "consigne_ventilateur": {"address": 60, "name": "Consigne Ventilateur", "unit": "rpm", "divisor": 1, "device_class": None, "icon": "mdi:fan"},
     "vitesse_ventilateur": {"address": 61, "name": "Vitesse Ventilateur", "unit": "rpm", "divisor": 1, "device_class": None, "icon": "mdi:fan"},
-    "niveau_ventil_ue": {"address": 106, "name": "Niveau Ventilation UE", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:fan"},
+    "niveau_ventil_ue": {"address": 106, "name": "Niveau Ventilation UE", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:fan-speed-1"},
     "heures_ventilateur": {"address": 125, "name": "Heures Ventilateur UI", "unit": "h", "divisor": 1, "device_class": "duration", "icon": "mdi:clock-outline"},
 
     # =========================================================================
-    # COMPRESSEUR
+    # COMPRESSEUR (7 registres)
     # =========================================================================
+    "courant_compresseur": {"address": 49, "name": "Courant Compresseur", "unit": "A", "divisor": 100, "device_class": "current", "icon": "mdi:current-ac"},
     "consigne_freq_compresseur": {"address": 65, "name": "Consigne Fréquence Compresseur", "unit": "Hz", "divisor": 10, "device_class": "frequency", "icon": "mdi:sine-wave"},
     "freq_compresseur": {"address": 66, "name": "Fréquence Compresseur", "unit": "Hz", "divisor": 10, "device_class": "frequency", "icon": "mdi:sine-wave"},
+    "temps_on_compresseur_bas": {"address": 72, "name": "Temps ON Compresseur (bas)", "unit": "s", "divisor": 1, "device_class": None, "icon": "mdi:timer"},
+    "temps_on_compresseur_haut": {"address": 73, "name": "Temps ON Compresseur (haut)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:timer"},
     "heures_compresseur": {"address": 127, "name": "Heures Compresseur", "unit": "h", "divisor": 1, "device_class": "duration", "icon": "mdi:clock-outline"},
 
     # =========================================================================
-    # TEMPÉRATURES PAC INTERNES
+    # TEMPÉRATURES PAC INTERNES (5 registres)
     # =========================================================================
     "temp_air_repris": {"address": 111, "name": "Température Air Repris UI", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
     "temp_exterieure": {"address": 112, "name": "Température Extérieure", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
@@ -100,13 +116,13 @@ REGISTERS = {
     "temp_sortie_compresseur": {"address": 117, "name": "Température Sortie Compresseur", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": False},
 
     # =========================================================================
-    # VANNES EEV (Détendeurs électroniques)
+    # VANNES EEV (Détendeurs électroniques) - 2 registres
     # =========================================================================
     "eev1": {"address": 104, "name": "EEV1", "unit": "Pls", "divisor": 1, "device_class": None, "icon": "mdi:valve"},
     "eev2": {"address": 105, "name": "EEV2", "unit": "Pls", "divisor": 1, "device_class": None, "icon": "mdi:valve"},
 
     # =========================================================================
-    # DÉBITS / PRESSIONS
+    # DÉBITS / PRESSIONS (5 registres)
     # =========================================================================
     "pse_debit_nominal": {"address": 247, "name": "PSE Débit Nominal", "unit": "Pa", "divisor": 1, "device_class": "pressure", "icon": "mdi:gauge"},
     "pse_debit_mini": {"address": 248, "name": "PSE Débit Mini", "unit": "Pa", "divisor": 1, "device_class": "pressure", "icon": "mdi:gauge"},
@@ -165,7 +181,7 @@ def read_all_registers(ser):
                 # Gestion des valeurs signées (températures négatives)
                 if reg.get("signed", False) and raw > 32767:
                     raw = raw - 65536
-                
+
                 value = raw / reg["divisor"]
                 values[key] = value
                 success_count += 1
@@ -174,7 +190,7 @@ def read_all_registers(ser):
         except Exception as e:
             logging.warning(f"Erreur lecture {key}: {e}")
             values[key] = None
-        
+
         time.sleep(0.05)
 
     logging.info(f"Lecture terminée: {success_count}/{len(REGISTERS)} registres OK")
@@ -197,7 +213,7 @@ def publish_discovery(mqtt_client):
         "name": "PAC Aldes T.One AIR",
         "manufacturer": "Aldes",
         "model": "T.One AIR RBUV",
-        "sw_version": "TOUG_RBUV 1.0"
+        "sw_version": "TOUG_RBUV 4.1"
     }
 
     for key, reg in REGISTERS.items():
@@ -230,7 +246,7 @@ def publish_values(mqtt_client, values):
 
     # Filtrer les None
     filtered = {k: v for k, v in values.items() if v is not None}
-    
+
     mqtt_client.publish(f"{MQTT_STATE_TOPIC}/state", json.dumps(filtered))
     logging.info(f"📤 Valeurs publiées sur MQTT ({len(filtered)}/{len(values)} registres)")
 
@@ -243,6 +259,8 @@ def print_status(values):
         logging.info(f"  T° Extérieure: {values['temp_exterieure']:.1f}°C")
     if values.get("freq_compresseur") is not None:
         logging.info(f"  Fréquence Compresseur: {values['freq_compresseur']:.1f} Hz")
+    if values.get("courant_compresseur") is not None:
+        logging.info(f"  Courant Compresseur: {values['courant_compresseur']:.2f} A")
 
 # =============================================================================
 # MAIN
@@ -254,11 +272,11 @@ def main():
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
-    print("""
+    print(f"""
 ╔══════════════════════════════════════════════════════════════╗
-║     TOUG_RBUV - Aldes T.One AIR Modbus Reader                ║
+║     TOUG_RBUV - Aldes T.One AIR Modbus Reader v4.1           ║
 ║     Raspberry Pi USB → MQTT → Home Assistant                 ║
-║     https://github.com/djtef/toug (projet TOUG original)     ║
+║     40 registres (R16/R17 retirés - non fonctionnels RBUV)   ║
 ╚══════════════════════════════════════════════════════════════╝
     """)
 

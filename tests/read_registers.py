@@ -108,8 +108,9 @@ TOUG_EXTENDED = {
     "toug_system": {
         14: {"name": "Panel ID (LSB)", "unit": "", "divisor": 1, "signed": False},
         15: {"name": "Panel ID (MSB)", "unit": "", "divisor": 1, "signed": False},
-        16: {"name": "Date encodée", "unit": "", "divisor": 1, "signed": False},
-        17: {"name": "Heure encodée", "unit": "", "divisor": 1, "signed": False},
+        # NOTE: R16/R17 non fonctionnels sur RBUV via USB (valeurs incohérentes)
+        # 16: {"name": "Date encodée", "unit": "", "divisor": 1, "signed": False},
+        # 17: {"name": "Heure encodée", "unit": "", "divisor": 1, "signed": False},
         51: {"name": "Protection Compresseur", "unit": "", "divisor": 1, "signed": False},
         90: {"name": "Code Défaut UE", "unit": "", "divisor": 1, "signed": False},
         131: {"name": "État Dégivrage", "unit": "", "divisor": 1, "signed": False},
