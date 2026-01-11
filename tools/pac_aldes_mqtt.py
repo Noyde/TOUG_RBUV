@@ -66,21 +66,22 @@ def build_registers():
         "panel_id_haut": {"address": 15, "name": "Panel ID (haut)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
         "protection_compresseur": {"address": 51, "name": "Protection Compresseur", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:shield"},
 
-        # CONSIGNES THERMOSTATS (6 registres)
+        # CONSIGNES THERMOSTATS (6 registres) - Mapping RBUV
+        # R20/R21 = même thermostat (Zone 1), R22=Zone2, R23=Zone3, R24=Zone4, R25=Zone5
         "consigne_zone1": {"address": 20, "name": f"Consigne {ZONES['zone1']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone2": {"address": 21, "name": f"Consigne {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone3": {"address": 22, "name": f"Consigne {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone4": {"address": 23, "name": f"Consigne {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone5": {"address": 24, "name": f"Consigne {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
-        "consigne_zone6": {"address": 25, "name": f"Consigne {ZONES['zone6']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone1bis": {"address": 21, "name": f"Consigne {ZONES['zone1']} bis", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone2": {"address": 22, "name": f"Consigne {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone3": {"address": 23, "name": f"Consigne {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone4": {"address": 24, "name": f"Consigne {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
+        "consigne_zone5": {"address": 25, "name": f"Consigne {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer"},
 
-        # TEMPÉRATURES ZONES (6 registres)
+        # TEMPÉRATURES ZONES (6 registres) - Mapping RBUV
         "temp_zone1": {"address": 36, "name": f"Température {ZONES['zone1']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:home-thermometer", "signed": True},
-        "temp_zone2": {"address": 37, "name": f"Température {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:bed", "signed": True},
-        "temp_zone3": {"address": 38, "name": f"Température {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:desk", "signed": True},
-        "temp_zone4": {"address": 39, "name": f"Température {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
-        "temp_zone5": {"address": 40, "name": f"Température {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
-        "temp_zone6": {"address": 41, "name": f"Température {ZONES['zone6']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone1bis": {"address": 37, "name": f"Température Zone 2", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone2": {"address": 38, "name": f"Température {ZONES['zone2']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:bed", "signed": True},
+        "temp_zone3": {"address": 39, "name": f"Température {ZONES['zone3']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:desk", "signed": True},
+        "temp_zone4": {"address": 40, "name": f"Température {ZONES['zone4']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
+        "temp_zone5": {"address": 41, "name": f"Température {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
 
         # COMPRESSEUR (6 registres)
         "courant_compresseur": {"address": 49, "name": "Courant Compresseur", "unit": "A", "divisor": 100, "device_class": "current", "icon": "mdi:current-ac"},
