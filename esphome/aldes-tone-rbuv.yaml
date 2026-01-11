@@ -250,25 +250,7 @@ sensor:
     address: 0x0F
     value_type: U_WORD
 
-  - platform: modbus_controller
-    modbus_controller_id: aldes
-    name: "Date Encodée"
-    disabled_by_default: true
-    entity_category: diagnostic
-    icon: mdi:calendar
-    register_type: holding
-    address: 0x10
-    value_type: U_WORD
-
-  - platform: modbus_controller
-    modbus_controller_id: aldes
-    name: "Heure Encodée"
-    disabled_by_default: true
-    entity_category: diagnostic
-    icon: mdi:clock
-    register_type: holding
-    address: 0x11
-    value_type: U_WORD
+# NOTE: R16/R17 (Date/Heure Encodées) retirés - non fonctionnels sur RBUV via USB
 
   - platform: modbus_controller
     modbus_controller_id: aldes

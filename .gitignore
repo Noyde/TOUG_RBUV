@@ -2,6 +2,9 @@
 secrets.yaml
 .esphome/
 
+# Scripts production (contiennent credentials)
+*_prod.py
+
 # Fichiers temporaires
 *.pyc
 __pycache__/
