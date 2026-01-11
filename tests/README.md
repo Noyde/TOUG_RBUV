@@ -91,13 +91,13 @@ sudo apt install python3-serial
 | ID | Reg | Hex | Zone | Diviseur | Signé | Résultat | Date |
 |----|-----|-----|------|----------|-------|----------|------|
 | T01 | 36 | 0x24 | Zone 1 | ÷100 | Oui | ✅ 21.06°C | 2025-01-10 |
-| T02 | 37 | 0x25 | Zone 2 | ÷100 | Oui | ✅ 21.06°C | 2025-01-10 |
-| T03 | 38 | 0x26 | Zone 3 | ÷100 | Oui | ✅ 20.00°C | 2025-01-10 |
-| T04 | 39 | 0x27 | Zone 4 | ÷100 | Oui | ✅ 21.43°C | 2025-01-10 |
-| T05 | 40 | 0x28 | Zone 5 | ÷100 | Oui | ✅ 21.18°C | 2025-01-10 |
-| T06 | 41 | 0x29 | Zone 6 | ÷100 | Oui | ✅ 20.18°C | 2025-01-10 |
+| T02 | 37 | 0x25 | Zone 1 bis | ÷100 | Oui | ✅ 21.06°C | 2025-01-10 |
+| T03 | 38 | 0x26 | Zone 2 | ÷100 | Oui | ✅ 20.00°C | 2025-01-10 |
+| T04 | 39 | 0x27 | Zone 3 | ÷100 | Oui | ✅ 21.43°C | 2025-01-10 |
+| T05 | 40 | 0x28 | Zone 4 | ÷100 | Oui | ✅ 21.18°C | 2025-01-10 |
+| T06 | 41 | 0x29 | Zone 5 | ÷100 | Oui | ✅ 20.18°C | 2025-01-10 |
 
-**Note** : Sur RBUV, R36-41 = températures zones. Différent de TOUG où R39 = T° extérieure.
+**Note** : Sur RBUV, R36-41 = températures zones. R36/R37 = même thermostat (Zone 1). Différent de TOUG où R39 = T° extérieure.
 
 ### 1.4 Températures PAC internes
 
@@ -123,15 +123,15 @@ sudo apt install python3-serial
 | V04 | 65 | 0x41 | Consigne fréquence | ÷10 | ✅ 38.0 Hz | 2025-01-10 |
 | V05 | 66 | 0x42 | Fréquence compresseur | ÷10 | ✅ 38.0 Hz | 2025-01-10 |
 | V06 | 72-73 | 0x48 | Temps ON compresseur (32-bit) | 1 | ✅ 2220 s | 2025-01-10 |
-| V07 | 91 | 0x5B | Position EEV1 | 1 | ⚠️ 0 | 2025-01-10 |
-| V08 | 93 | 0x5D | Vitesse ventilateur UE | 1 | ⚠️ 0 | 2025-01-10 |
-| V09 | 104 | 0x68 | EEV1 | 1 | ✅ 234 Pls | 2025-01-10 |
+| V07 | 91 | 0x5B | Position EEV1 (TOUG) | 1 | ⚠️ 0 (non implémenté RBUV) | 2025-01-10 |
+| V08 | 93 | 0x5D | Vitesse ventilateur UE (TOUG) | 1 | ⚠️ 0 (non implémenté RBUV) | 2025-01-10 |
+| V09 | 104 | 0x68 | EEV1 (RBUV) | 1 | ✅ 234 Pls | 2025-01-10 |
 | V10 | 105 | 0x69 | EEV2 | 1 | ✅ 0 Pls | 2025-01-10 |
 | V11 | 106 | 0x6A | Niveau ventilation UE | 1 | ✅ 5 | 2025-01-10 |
 | V12 | 125 | 0x7D | Heures ventilateur | 1 | ✅ 25500 h | 2025-01-10 |
 | V13 | 127 | 0x7F | Heures compresseur | 1 | ✅ 12600 h | 2025-01-10 |
 
-**Note** : R91 et R93 retournent 0. Registres différents ou non implémentés sur RBUV.
+**Note** : R91 et R93 sont des registres TOUG qui retournent 0 sur RBUV. Utiliser R104/R105 pour EEV sur RBUV.
 
 ### 1.6 Débits / Pressions
 
@@ -192,7 +192,7 @@ sudo apt install python3-serial
 | 1 | 1 | Fonction | 0x17 (Read/Write Multiple) |
 | 2-3 | 2 | Sous-code séquence | 0x0001→0x0041→0x0081→0x00C1 (cycle) |
 | 4-5 | 2 | Longueur | 0x0040 |
-| 6-9 | 4 | Constantes | 0x00570x001F |
+| 6-9 | 4 | Constantes | 0x0057 0x001F |
 | 10-11 | 2 | Signature | 0x7370 ("sp") |
 | 12-13 | 2 | Version | 0x1804 |
 | 14-17 | 4 | ? | À identifier |
