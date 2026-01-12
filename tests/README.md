@@ -48,6 +48,7 @@ sudo apt install python3-serial
 | Scan R0-R500 | 203 | 40 | 0 | 163 | 🔍 À identifier |
 | **Écriture Modbus** | | | | | |
 | USB (standard) | 8 | 0 | 8 | 0 | ✅ Échec attendu |
+| USB FC16 | 9 | 0 | 9 | 0 | ✅ Accepté mais ignoré (USB read-only) |
 | RS485 (standard) | 2 | 0 | 0 | 2 | ⬜ W03-W04 |
 | **Protocole 0x17** | | | | | |
 | Sniff modes PAC | 10 | 0 | 0 | 10 | ⬜ X01-X10 |
@@ -238,6 +239,48 @@ sudo apt install python3-serial
 | W08 | 31102 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W09 | 31103 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W10 | 31104 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+
+### 2.2 Tests FC16 (Write Multiple Registers) - USB (2025-01-12)
+
+> **Objectif** : Vérifier si FC16 permet d'écrire sur certains registres via USB.
+> **Rapport détaillé** : `results/rapport_recherche_registres_2025-01-12.md`
+
+| ID | Registres | FC16 | Observation | Date |
+|----|-----------|------|-------------|------|
+| W11 | R20-R25 (consignes zones) | ❌ illegal data address | Confirmé lecture seule | 2025-01-12 |
+| W12 | R362-R374 (seuils) | ❌ illegal data address | Non accessibles en écriture | 2025-01-12 |
+| W13 | R90,R92,R94,R96 | ✅ Accepté | Stats/compteurs ? | 2025-01-12 |
+| W14 | R101,R102 | ✅ Accepté | R101=20.0°C (consigne?) | 2025-01-12 |
+| W15 | R104,R107,R108,R110 | ✅ Accepté | EEV/flags | 2025-01-12 |
+| W16 | R111-R115,R117 | ✅ Accepté | Températures PAC | 2025-01-12 |
+
+**Total : 16 registres acceptent FC16** (R90, R92, R94, R96, R101, R102, R104, R107, R108, R110, R111-R115, R117)
+
+#### ⚠️ ATTENTION : Faille du test
+
+Ces tests ont écrit LA MÊME valeur que celle lue. Cela ne prouve pas que l'écriture est effective.
+La PAC peut accepter la commande mais ignorer le contenu.
+
+### 2.3 Tests FC16 avec valeur différente - ✅ EFFECTUÉS (2025-01-12)
+
+| ID | Test | Registre | Avant | Écrit | Après | Résultat | Date |
+|----|------|----------|-------|-------|-------|----------|------|
+| W17 | FC16 valeur différente | R107 | 129 | 254 | 30 | ❌ Dynamique | 2025-01-12 |
+| W18 | FC16 valeur différente | R108 | 16 | 254 | 255 | ❌ Dynamique | 2025-01-12 |
+| W19 | FC16 valeur différente | R110 | 255 | 254 | 255 | ❌ Ignoré | 2025-01-12 |
+
+### ✅ Conclusion finale écriture USB
+
+**Le bus USB est LECTURE SEULE sur firmware 3019 RBUV.**
+
+| Function Code | Résultat |
+|---------------|----------|
+| FC06 (Write Single) | "illegal function" |
+| FC16 (Write Multiple) | Accepté mais **ignoré** |
+
+**Seule option écriture confirmée : Protocole 0x17 sur bus RS485 télécommande.**
+
+**Découverte bonus** : R107/R108 sont des registres dynamiques (capteurs temps réel), pas des flags à 255
 
 ---
 
