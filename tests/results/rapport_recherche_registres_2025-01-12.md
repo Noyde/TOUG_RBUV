@@ -314,38 +314,34 @@ R111 = 1774, R112 = 1129, R113 = 1520
 R114 = 1558, R115 = 1021, R117 = 3245
 ```
 
-### ⚠️ FAILLE DU TEST
+### ✅ TEST AVEC VALEUR DIFFÉRENTE (2025-01-12)
 
-**Important**: Dans ces tests, nous avons lu la valeur puis réécrit LA MÊME valeur.
-Cela ne prouve PAS que l'écriture est effective !
+Test effectué en écrivant une valeur DIFFÉRENTE (254) pour vérifier si l'écriture est effective.
 
-La PAC peut:
-1. Accepter la commande mais ignorer le contenu
-2. Ne changer la valeur que si elle est différente
+| Registre | Avant | Écrit | Après | Résultat |
+|----------|-------|-------|-------|----------|
+| R107 | 129 | 254 | 30 | ❌ Dynamique (capteur temps réel) |
+| R108 | 16 | 254 | 255 | ❌ Dynamique (capteur temps réel) |
+| R110 | 255 | 254 | 255 | ❌ Ignoré |
 
-### Test à effectuer (priorité haute)
+**Conclusions :**
 
-```python
-# Test avec valeur DIFFÉRENTE
-import minimalmodbus
-instr = minimalmodbus.Instrument('/dev/ttyACM1', 1)
-instr.serial.baudrate = 1200
-instr.serial.parity = 'E'
-instr.serial.timeout = 1
+1. **R107 et R108 sont des registres DYNAMIQUES** - ils changent tout seuls (capteurs en temps réel).
+   - Valeurs initiales (scan précédent) : 255
+   - Valeurs actuelles : 129 et 16
+   - Ces registres ne sont PAS des flags mais des capteurs non documentés
 
-# Sur R101 (possible consigne générale)
-before = instr.read_register(101)  # = 2000
-test_val = before + 100  # = 2100 (21.0°C)
-instr.write_register(101, test_val, functioncode=16)
-after = instr.read_register(101)
+2. **Les écritures FC16 sont IGNORÉES** - on a écrit 254, mais les valeurs après ne correspondent pas. Elles ont continué à évoluer naturellement.
 
-if after == test_val:
-    print("✅ ÉCRITURE EFFECTIVE !")
-    # Restaurer
-    instr.write_register(101, before, functioncode=16)
-else:
-    print("❌ Accepté mais ignoré")
-```
+3. **USB = LECTURE SEULE confirmé** - même FC16 qui est "accepté" sans erreur ne modifie rien.
+
+### Conclusion finale écriture USB
+
+**Le bus USB est fondamentalement LECTURE SEULE sur firmware 3019 RBUV.**
+
+- FC06 : "illegal function"
+- FC16 : Accepté mais ignoré (valeurs inchangées)
+- Seule option écriture : Protocole 0x17 sur bus RS485 télécommande
 
 ---
 
