@@ -13,7 +13,6 @@
 # Configuration:
 # - Copier secrets_example.yaml vers secrets.yaml
 # - Personnaliser les noms de zones dans substitutions ci-dessous
-#   ou dans secrets.yaml
 #
 # ═══════════════════════════════════════════════════════════════
 

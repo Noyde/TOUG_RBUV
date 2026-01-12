@@ -194,7 +194,7 @@ Configuration principale ESPHome. Définit :
 ### `esphome/secrets_example.yaml`
 Fichier de configuration exemple (copier en `secrets.yaml`) :
 - Credentials WiFi (ssid, password)
-- Noms des 6 zones (personnalisables)
+- Clés API/OTA (optionnelles)
 
 ### `esphome/components/aldes_tone/aldes_tone.h`
 Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
