@@ -30,7 +30,7 @@ sudo apt install python3-serial
 
 ---
 
-## Résumé des tests (2025-01-11)
+## Résumé des tests (2025-01-12)
 
 | Groupe | Total | OK | KO | À faire | Notes |
 |--------|-------|----|----|---------|-------|
@@ -41,6 +41,11 @@ sudo apt install python3-serial
 | TOUG Ventilation | 4 | 4 | 0 | 0 | R91/R93 = 0 |
 | TOUG Extended | 4 | 0 | 4 | 0 | ❌ Non implémentés |
 | TOUG Consignes | 5 | 0 | 5 | 0 | ❌ Confirmé KO |
+| **Exploration registres** | | | | | |
+| Adresse esclave | 1 | 1 | 0 | 0 | ✅ Adresse 1 confirmée |
+| Registres guix77 | 5 | 5 | 0 | 0 | ✅ Existent, sens différent |
+| Compteurs temps | 2 | 2 | 0 | 0 | ✅ R131/R136 validés |
+| Scan R0-R500 | 203 | 40 | 0 | 163 | 🔍 À identifier |
 | **Écriture Modbus** | | | | | |
 | USB (standard) | 8 | 0 | 8 | 0 | ✅ Échec attendu |
 | RS485 (standard) | 2 | 0 | 0 | 2 | ⬜ W03-W04 |
@@ -158,6 +163,62 @@ sudo apt install python3-serial
 | E09 | 31104 | Consigne Zone K4 | ✅ | ❌ 0 (KO tous modèles) | 2025-01-10 |
 
 > **Conclusion** : Les registres étendus TOUG (5029, 6021, 20063, 30026) et les consignes (31100-31104) ne sont **pas implémentés** sur le firmware 3019 RBUV. Confirmé par @djtef que R31100-31104 ne fonctionnent sur **aucun modèle**.
+
+### 1.8 Exploration registres non documentés (2025-01-12)
+
+> **Objectif** : Découvrir des registres non documentés dans TOUG, basé sur recherche web (projet guix77, communauté Jeedom).
+> **Rapport détaillé** : `results/rapport_recherche_registres_2025-01-12.md`
+
+#### 1.8.1 Tests préliminaires
+
+| ID | Test | Résultat | Date |
+|----|------|----------|------|
+| N01 | Adresse esclave 2 | ❌ No communication (confirmé = 1) | 2025-01-12 |
+| N02 | Magic number Aldes R0-R3 | ❌ Absent (R1 = firmware 3019) | 2025-01-12 |
+| N03 | Registres guix77 (R120, R122, R150...) | ✅ Existent, sens différent | 2025-01-12 |
+| N04 | R131 compteur temps | ✅ +1/seconde (temps compresseur) | 2025-01-12 |
+| N05 | R136 miroir R131 | ✅ Même valeur que R131 | 2025-01-12 |
+| N06 | Scan R0-R500 | ✅ 203 registres trouvés | 2025-01-12 |
+
+#### 1.8.2 Registres découverts - Compteurs temps
+
+| Reg | Valeur exemple | Description | Statut |
+|-----|----------------|-------------|--------|
+| R131 | 44069 (12h14m) | Compteur secondes compresseur | ✅ Validé |
+| R136 | 44069 | Miroir R131 | ✅ Validé |
+| R160 | 103 | Compteur lent ? | 🔍 À valider |
+
+#### 1.8.3 Registres découverts - Températures/Consignes
+
+| Reg | Valeur | Hypothèse | Statut |
+|-----|--------|-----------|--------|
+| R70 | 20.00°C | Consigne générale ? | 🔍 À valider console |
+| R101 | 20.00°C | = R70 = R210 | 🔍 À valider console |
+| R111 | 18.51°C | T° ambiante moyenne | 🔍 À valider console |
+| R120 | 16.00°C / 0 | **Dynamique** (dépend état PAC) | 🔍 À valider console |
+| R204 | 23.84°C | Température interne | 🔍 À valider console |
+| R210 | 20.00°C | = R70 = R101 | 🔍 À valider console |
+
+#### 1.8.4 Registres découverts - Zone R300+ (jamais documentée)
+
+| Reg | Valeur | Hypothèse | Statut |
+|-----|--------|-----------|--------|
+| R317-R322 | 2-5 | États/flags par zone ? | 🔍 À identifier |
+| R362 | 16.00°C | Seuil bas / antigel ? | 🔍 À valider console |
+| R363 | 24.00°C | Seuil haut été ? | 🔍 À valider console |
+| R364 | 22.00°C | Consigne clim ? | 🔍 À valider console |
+| R365 | 31.00°C | Seuil alarme ? | 🔍 À valider console |
+| R374 | 2.00°C | Hystérésis ? | 🔍 À valider console |
+
+#### 1.8.5 Tests à faire sur console PAC
+
+| ID | Test | Registres | Comment valider |
+|----|------|-----------|-----------------|
+| N07 | Consigne affichée = 20°C ? | R70/R101/R210 | Lire écran PAC |
+| N08 | R120 change avec mode | R120 | Basculer Eco ↔ Confort |
+| N09 | R362-R365 = seuils menu ? | R362-R365 | Chercher dans paramètres |
+| N10 | R204 = quelle température ? | R204 | Comparer avec écran |
+| N11 | Identifier R317-R322 | R317-R322 | Observer si change avec zones |
 
 ---
 
@@ -417,4 +478,4 @@ Fichier : `results/YYYY-MM-DD_ID-description.md`
 
 ---
 
-*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-11*
+*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-12*

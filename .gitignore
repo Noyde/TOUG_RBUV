@@ -20,7 +20,8 @@ captures/*.bin
 .vscode/
 .idea/
 
-# Résultats de tests (garder .gitkeep et rapports de référence)
+# Résultats de tests (garder .gitkeep et rapports)
 tests/results/*
 !tests/results/.gitkeep
 !tests/results/rapport_reference_*.md
+!tests/results/rapport_recherche_*.md
