@@ -48,6 +48,7 @@ sudo apt install python3-serial
 | Scan R0-R500 | 203 | 40 | 0 | 163 | 🔍 À identifier |
 | **Écriture Modbus** | | | | | |
 | USB (standard) | 8 | 0 | 8 | 0 | ✅ Échec attendu |
+| USB FC16 | 6 | 4 | 2 | 3 | ⚠️ 16 reg acceptent FC16, à valider |
 | RS485 (standard) | 2 | 0 | 0 | 2 | ⬜ W03-W04 |
 | **Protocole 0x17** | | | | | |
 | Sniff modes PAC | 10 | 0 | 0 | 10 | ⬜ X01-X10 |
@@ -238,6 +239,57 @@ sudo apt install python3-serial
 | W08 | 31102 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W09 | 31103 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
 | W10 | 31104 | 0x06 | USB | illegal data address | ✅ illegal data address | 2025-01-10 |
+
+### 2.2 Tests FC16 (Write Multiple Registers) - USB (2025-01-12)
+
+> **Objectif** : Vérifier si FC16 permet d'écrire sur certains registres via USB.
+> **Rapport détaillé** : `results/rapport_recherche_registres_2025-01-12.md`
+
+| ID | Registres | FC16 | Observation | Date |
+|----|-----------|------|-------------|------|
+| W11 | R20-R25 (consignes zones) | ❌ illegal data address | Confirmé lecture seule | 2025-01-12 |
+| W12 | R362-R374 (seuils) | ❌ illegal data address | Non accessibles en écriture | 2025-01-12 |
+| W13 | R90,R92,R94,R96 | ✅ Accepté | Stats/compteurs ? | 2025-01-12 |
+| W14 | R101,R102 | ✅ Accepté | R101=20.0°C (consigne?) | 2025-01-12 |
+| W15 | R104,R107,R108,R110 | ✅ Accepté | EEV/flags | 2025-01-12 |
+| W16 | R111-R115,R117 | ✅ Accepté | Températures PAC | 2025-01-12 |
+
+**Total : 16 registres acceptent FC16** (R90, R92, R94, R96, R101, R102, R104, R107, R108, R110, R111-R115, R117)
+
+#### ⚠️ ATTENTION : Faille du test
+
+Ces tests ont écrit LA MÊME valeur que celle lue. Cela ne prouve pas que l'écriture est effective.
+La PAC peut accepter la commande mais ignorer le contenu.
+
+### 2.3 Tests à effectuer (priorité haute)
+
+| ID | Test | Registre | Commande | Résultat attendu | Date |
+|----|------|----------|----------|------------------|------|
+| W17 | FC16 valeur différente R101 | R101 | Lire, +100, écrire, relire | Valeur change ou pas ? | ⬜ |
+| W18 | FC16 valeur différente R90 | R90 | Lire, +100, écrire, relire | Valeur change ou pas ? | ⬜ |
+| W19 | FC16 valeur différente R96 | R96 | Lire, +1, écrire, relire | Valeur change ou pas ? | ⬜ |
+
+```python
+# Script test W17 - FC16 avec valeur différente
+import minimalmodbus
+instr = minimalmodbus.Instrument('/dev/ttyACM1', 1)
+instr.serial.baudrate = 1200
+instr.serial.parity = 'E'
+instr.serial.timeout = 1
+
+before = instr.read_register(101)  # ex: 2000
+test_val = before + 100  # ex: 2100
+print(f'R101 avant: {before}')
+instr.write_register(101, test_val, functioncode=16)
+import time; time.sleep(0.5)
+after = instr.read_register(101)
+print(f'R101 après: {after}')
+if after == test_val:
+    print('✅ ÉCRITURE EFFECTIVE !')
+    instr.write_register(101, before, functioncode=16)  # restaurer
+else:
+    print('❌ Accepté mais ignoré (valeur inchangée)')
+```
 
 ---
 

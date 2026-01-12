@@ -283,6 +283,72 @@ Hypothèse : zone de configuration du protocole télécommande.
 
 ---
 
+## Tests d'écriture FC16 (Write Multiple Registers)
+
+### Test FC06 (Write Single Register)
+
+Résultat sur tous les registres testés: **"illegal function"**
+
+La PAC n'implémente pas la fonction standard 0x06.
+
+### Test FC16 (Write Multiple Registers)
+
+| Registre | FC16 | Observation |
+|----------|------|-------------|
+| R20-R25 (consignes zones) | ❌ illegal data address | Confirmé lecture seule |
+| R362-R374 (seuils) | ❌ illegal data address | Non accessibles |
+| R90, R92, R94, R96 | ✅ Accepté | Stats/compteurs ? |
+| R101, R102 | ✅ Accepté | R101 = 20.0°C (consigne ?) |
+| R104 | ✅ Accepté | EEV1 - DANGEREUX |
+| R107, R108, R110 | ✅ Accepté | = 255, flags ? |
+| R111-R115 | ✅ Accepté | Températures PAC |
+| R117 | ✅ Accepté | T° sortie compresseur |
+
+**Total: 16 registres acceptent FC16**
+
+```
+R90 = 2176, R92 = 2181, R94 = 2176, R96 = 37
+R101 = 2000 (20.0°C), R102 = 129
+R104 = 110 (EEV1), R107 = 255, R108 = 255, R110 = 255
+R111 = 1774, R112 = 1129, R113 = 1520
+R114 = 1558, R115 = 1021, R117 = 3245
+```
+
+### ⚠️ FAILLE DU TEST
+
+**Important**: Dans ces tests, nous avons lu la valeur puis réécrit LA MÊME valeur.
+Cela ne prouve PAS que l'écriture est effective !
+
+La PAC peut:
+1. Accepter la commande mais ignorer le contenu
+2. Ne changer la valeur que si elle est différente
+
+### Test à effectuer (priorité haute)
+
+```python
+# Test avec valeur DIFFÉRENTE
+import minimalmodbus
+instr = minimalmodbus.Instrument('/dev/ttyACM1', 1)
+instr.serial.baudrate = 1200
+instr.serial.parity = 'E'
+instr.serial.timeout = 1
+
+# Sur R101 (possible consigne générale)
+before = instr.read_register(101)  # = 2000
+test_val = before + 100  # = 2100 (21.0°C)
+instr.write_register(101, test_val, functioncode=16)
+after = instr.read_register(101)
+
+if after == test_val:
+    print("✅ ÉCRITURE EFFECTIVE !")
+    # Restaurer
+    instr.write_register(101, before, functioncode=16)
+else:
+    print("❌ Accepté mais ignoré")
+```
+
+---
+
 ## Pistes pour modification consignes thermostats
 
 ### Limitation connue
