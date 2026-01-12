@@ -228,10 +228,78 @@ R362 a la même valeur que R120 avait. Peut-être le registre de configuration d
 | R364 | 22.0°C | Consigne clim |
 | R365 | 31.0°C | Alarme surchauffe |
 
-### 5. Zone R300+ existe
+### 5. Zone R300+ existe (jamais documentée)
 
 169 registres trouvés dans la zone R0-R300, mais aussi des registres dans R317-R393.
 Cette zone n'est documentée nulle part.
+
+#### Hypothèses par plage
+
+| Plage | Valeurs | Hypothèse |
+|-------|---------|-----------|
+| R317-R322 | 2-5 (6 valeurs) | **États des 6 zones** (demande, satisfait, etc.) |
+| R325-R330 | 91-279 (6 valeurs, symétrique) | **Stats/compteurs par zone** |
+| R341-R355 | 120-920, plusieurs "900" | **Paramètres ventilation** (900 = débit nominal) |
+| R362-R369 | 16, 24, 22, 31°C + 25-60 | **Seuils régulation** (antigel, été, clim, alarme) |
+| R375-R381 | 0x7370="sp", 0x1804, 0x5831="X1" | **Signature protocole** (même que trame 0x17) |
+| R390-R393 | 1-12 | **Flags divers** |
+
+#### Détail R317-R322 (états zones ?)
+
+```
+R317 = 5  → Zone 1 ?
+R318 = 3  → Zone 1bis ?
+R319 = 2  → Zone 2 ?
+R320 = 2  → Zone 3 ?
+R321 = 3  → Zone 4 ?
+R322 = 3  → Zone 5 ?
+```
+
+Hypothèse : 0=off, 1=standby, 2=satisfait, 3=demande faible, 4=demande moyenne, 5=demande forte
+
+#### Détail R362-R369 (seuils régulation)
+
+```
+R362 = 1600 = 16.0°C  → Seuil antigel / température minimale
+R363 = 2400 = 24.0°C  → Seuil été / déclenchement clim
+R364 = 2200 = 22.0°C  → Consigne mode clim ?
+R365 = 3100 = 31.0°C  → Alarme surchauffe
+R366 = 30             → Délai ou hystérésis
+R367 = 25             → Délai ou hystérésis
+R368 = 60             → Timeout ?
+R369 = 60             → Timeout ?
+```
+
+#### Détail R375-R381 (signature protocole)
+
+```
+R375 = 29552 = 0x7370 = "sp"   → Signature identique à trame 0x17 !
+R376 = 6148  = 0x1804          → Version identique à trame 0x17 !
+R379 = 22577 = 0x5831 = "X1"   → Identifiant modèle ?
+```
+
+Ces registres contiennent la **même signature** que la trame 0x17.
+Hypothèse : zone de configuration du protocole télécommande.
+
+---
+
+## Pistes pour modification consignes thermostats
+
+### Limitation connue
+
+Les registres R20-R25 sont **lecture seule** (pilotés par radio 868MHz).
+Les registres TOUG 31100-31104 ne fonctionnent sur **aucun modèle**.
+
+### Pistes alternatives
+
+| Piste | Registres | Méthode | Probabilité |
+|-------|-----------|---------|-------------|
+| Consigne générale | R70/R101/R210 | Écriture 0x17 | Moyenne |
+| Seuils | R362-R365 | Écriture 0x17 | Faible |
+| **Trame 0x17** | **Offset 40-69** | **Sniff télécommande** | **Haute** |
+
+**Priorité** : Sniffer la télécommande quand on modifie une consigne via le menu.
+L'offset 40-69 contient probablement les consignes (pattern 0x7FFE = "pas de changement").
 
 ---
 
