@@ -15,6 +15,12 @@ import glob
 import serial
 import paho.mqtt.client as mqtt
 
+# Configuration logging (avant tout le reste pour l'auto-détection)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 # =============================================================================
 # CHARGEMENT CONFIGURATION
 # =============================================================================
@@ -364,11 +370,6 @@ def print_status(values):
 # =============================================================================
 
 def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
-
     print(f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║     PAC Aldes T.One AIR - TOUG_RBUV v4.3                     ║
