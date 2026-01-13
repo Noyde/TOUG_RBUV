@@ -31,12 +31,28 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 | R117 | Échangeur capillaire | **T° sortie compresseur** |
 | R44 | T° sortie compresseur | ❌ Non implémenté |
 
-## Structure trame 0x17 (74 bytes)
-- Offset 18-19: Niveau (0x0000=Confort, 0x00C8=Eco, 0x5678=Boost)
-- Offset 32-33: Vacances (0x0000=Off, 0x1234=On)
-- Offset 34-35: On/Off (0x0002=Off, 0x0003=On)
-- Offset 36-37: Type (0x000C=Chauffage, 0x000A=Clim)
-- Offset 72-73: CRC16 Modbus
+## Structure trame 0x17 (74 bytes) - VALIDÉ 2025-01-13
+
+| Offset | Description | Valeurs |
+|--------|-------------|---------|
+| 0-1 | Adresse + Fonction | 0x01, 0x17 |
+| 2-3 | Sous-code séquence | Cycle: 0x0001→0x0041→0x0081→0x00C1 |
+| 10-11 | Signature | 0x7370 ("sp") |
+| 14-15 | Compteur | Incrémente à chaque trame |
+| **18-19** | **Niveau** | 0x0000=Confort, 0x00C8=Eco |
+| **20-21** | **Boost** | 0x0000=Normal, 0x5678=Boost |
+| **24-25** | **Flag service** | 0x0000=Normal, 0x3412=Mode installateur |
+| **26-27** | **Débit nominal** | m³/h (ex: 0x0384=900) |
+| **28-29** | **PSE nominal** | Pa (ex: 0x0017=23) |
+| **30-31** | **Débit 1 bouche** | m³/h (ex: 0x00F0=240) |
+| **32-33** | **PSE mini** | Pa (ex: 0x000C=12) |
+| **34-35** | **Vacances** | 0x0000=Off, 0x1234=On |
+| **36-37** | **On/Off** | 0x0002=Off, 0x0003=On |
+| **38-39** | **Type mode** | 0x000A=Clim, 0x000B=Service, 0x000C=Chauffage |
+| 40-69 | Consignes zones | Pattern 0x7FFE = pas de changement |
+| 72-73 | CRC16 Modbus | Calculé sur bytes 0-71 |
+
+> ⚠️ **Note** : La date/heure n'est PAS transmise dans la trame 0x17 (validé X19-X20)
 
 ## Mapping thermostats corrigé
 | Registre | Zone |
@@ -50,8 +66,10 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 
 ## Statut projet
 - ✅ Lecture 40 registres via Pi Zero USB
-- ✅ Protocole 0x17 documenté
-- ⚠️ Composant ESPHome à revalider
+- ✅ Protocole 0x17 documenté et **validé par sniffing** (2025-01-13)
+- ✅ Tests sniffing X01-X20 complétés (modes, ventilation, date/heure)
+- ⚠️ Tests envoi ESP32 (Y01-Y07) à faire
+- ⚠️ Composant ESPHome à mettre à jour avec offsets corrigés
 - ⚠️ Projet BETA - utilisation à vos risques
 
 ## Ressources
@@ -141,16 +159,22 @@ TOUG_RBUV/
 | Écriture R20 (consigne) | USB | 0x06 | 20 | ✅ illegal data address |
 | Écriture R31100-31104 (TOUG) | USB | 0x06 | 31100+ | ✅ illegal data address |
 
-### Tests protocole 0x17 (sniffing télécommande)
+### Tests protocole 0x17 (sniffing télécommande) ✅ VALIDÉS 2025-01-13
 
-| Test | Action télécommande | Offset à vérifier | Valeur attendue |
-|------|---------------------|-------------------|-----------------|
-| Chauffage Confort → Off | Bouton Off | 34-35 | 0x0002 |
-| Off → Chauffage Confort | Bouton Chauffage | 34-35 | 0x0003 |
-| Confort → Eco | Menu Eco | 18-19 | 0x00C8 |
-| Chauffage → Clim | Bouton Clim | 36-37 | 0x000A |
-| Clim → Boost | Menu Boost | 18-19 | 0x5678 |
-| Activation Vacances | Menu Vacances | 32-33 | 0x1234 |
+| Test | Action | Offset | Valeur | Statut |
+|------|--------|--------|--------|--------|
+| X01-X02 | On/Off | 36-37 | 0x0002/0x0003 | ✅ |
+| X03-X04 | Eco/Confort | 18-19 | 0x00C8/0x0000 | ✅ |
+| X05-X06 | Chauffage/Clim | 38-39 | 0x000C/0x000A | ✅ |
+| X07 | Boost | 20-21 | 0x5678 | ✅ |
+| X08-X09 | Vacances | 34-35 | 0x1234/0x0000 | ✅ |
+| X11-X12 | Débit nominal | 26-27 | m³/h | ✅ |
+| X13-X14 | PSE nominal | 28-29 | Pa | ✅ |
+| X15-X16 | Débit 1 bouche | 30-31 | m³/h | ✅ |
+| X17-X18 | PSE mini | 32-33 | Pa | ✅ |
+| X19-X20 | Date/heure | - | Non transmise | ❌ |
+
+> **Découvertes clés** : Flag mode service (24-25=0x3412), Type mode étendu (38-39 inclut 0x000B=Service)
 
 ### Tests envoi trame 0x17 (ESP32 → PAC)
 
@@ -289,6 +313,7 @@ Messages préfixés :
 3. **Écriture USB** : IMPOSSIBLE sur modèles 2018. Seul le bus RS485 accepte le protocole 0x17.
 4. **Registres TOUG 31100-31104** : Ne fonctionnent sur **aucun modèle** T.One (confirmé par @djtef). Erreur dans la doc TOUG.
 5. **Registres R16/R17 (Date/Heure)** : NON FONCTIONNELS sur RBUV via USB. Valeurs incohérentes lors de tests 2025-01-11.
+6. **Date/heure via 0x17** : NON TRANSMISE dans la trame télécommande (validé X19-X20). Chaque appareil maintient sa propre horloge.
 
 ---
 
@@ -348,10 +373,11 @@ Existe sur l'installation locale (Mushroom Cards, 5 onglets) mais pas encore exp
 ### Ce qui bloque la publication
 
 - ~~Revalidation complète de tous les tests~~ ✅ Lecture complétée (2025-01-10)
-- Tests écriture RS485 (W03-W04)
-- Tests protocole 0x17 (sniffing + envoi)
+- ~~Tests protocole 0x17 sniffing~~ ✅ X01-X20 complétés (2025-01-13)
+- Tests envoi trame 0x17 (Y01-Y07) - ESP32 → PAC
+- Mise à jour composant ESPHome avec offsets corrigés
+- Tests écriture RS485 standard (W03-W04)
 - Tests long terme du composant ESPHome
-- Documentation des cas d'erreur
 
 ---
 
