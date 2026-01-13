@@ -289,29 +289,34 @@ La PAC peut accepter la commande mais ignorer le contenu.
 
 ### 3.0 Structure trame 0x17 (74 bytes)
 
-> **Référence** : Basé sur l'analyse de `esphome/components/aldes_tone/aldes_tone.h`
+> **Référence** : Validé par sniffing 2025-01-13
 
 | Offset | Taille | Description | Valeurs connues |
 |--------|--------|-------------|-----------------|
 | 0 | 1 | Adresse Modbus | 0x01 |
 | 1 | 1 | Fonction | 0x17 (Read/Write Multiple) |
-| 2-3 | 2 | Sous-code séquence | 0x0001→0x0041→0x0081→0x00C1 (cycle) |
-| 4-5 | 2 | Longueur | 0x0040 |
-| 6-9 | 4 | Constantes | 0x0057 0x001F |
+| 2-3 | 2 | Sous-code séquence | 0x0081→0x00C1→0x0001→0x0041 (cycle) |
+| 4-5 | 2 | Longueur | 0x0040 (64) |
+| 6-7 | 2 | Constante | 0x0057 |
+| 8-9 | 2 | Constante | 0x001F |
 | 10-11 | 2 | Signature | 0x7370 ("sp") |
 | 12-13 | 2 | Version | 0x1804 |
-| 14-17 | 4 | ? | À identifier |
+| 14-15 | 2 | Compteur | Incrémente à chaque trame |
+| 16-17 | 2 | ? | 0xF67A observé |
 | **18-19** | 2 | **Niveau** | 0x0000=Confort, 0x00C8=Eco, 0x5678=Boost |
-| 20-27 | 8 | ? | À identifier |
-| **28-29** | 2 | **Débit nominal** | 0x0384=900 m³/h (hypothèse) |
-| **30-31** | 2 | **PSE débit nominal** | 0x0017=23 Pa (hypothèse) |
-| **32-33** | 2 | **Vacances** | 0x0000=Off, 0x1234=On |
-| **34-35** | 2 | **On/Off** | 0x0002=Off, 0x0003=On |
-| **36-37** | 2 | **Type mode** | 0x000C=Chauffage, 0x000A=Clim |
-| 38-39 | 2 | ? | À identifier |
-| 40-69 | 30 | Consignes (?) | Pattern 0x7FFE = pas de changement ? |
-| 70-71 | 2 | ? | À identifier |
+| 20-25 | 6 | Padding ? | 0x0000 |
+| **26-27** | 2 | **Débit nominal** | ✅ 0x0384=900 m³/h |
+| **28-29** | 2 | **PSE nominal** | ✅ 0x0017=23 Pa |
+| 30-31 | 2 | ? | 0x00F0=240 (débit mini ?) |
+| **32-33** | 2 | **Type mode** | ✅ 0x000C=Chauffage, 0x000A=Clim |
+| **34-35** | 2 | **Vacances** | 0x0000=Off, 0x1234=On |
+| **36-37** | 2 | **On/Off** | ✅ 0x0002=Off, 0x0003=On |
+| 38-39 | 2 | Type mode (copie?) | 0x000C |
+| 40-69 | 30 | Consignes zones | Pattern 0x7FFE = pas de changement |
+| 70-71 | 2 | ? | 0x0000 |
 | 72-73 | 2 | CRC16 Modbus | Calculé |
+
+> ⚠️ **Correction 2025-01-13** : Offsets 32-37 corrigés suite au sniffing X01
 
 ### 3.1 Sniffing télécommande
 
@@ -346,15 +351,15 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 | ID | Action télécommande | Offset | Valeur attendue | Résultat | Date |
 |----|---------------------|--------|-----------------|----------|------|
-| X01 | Chauffage Confort → Off | 34-35 | 0x0002 | ⬜ | |
-| X02 | Off → Chauffage Confort | 34-35 | 0x0003 | ⬜ | |
+| X01 | Chauffage Confort → Off | **36-37** | 0x0002 | ✅ | 2025-01-13 |
+| X02 | Off → Chauffage Confort | 36-37 | 0x0003 | ⬜ | |
 | X03 | Confort → Eco | 18-19 | 0x00C8 | ⬜ | |
 | X04 | Eco → Confort | 18-19 | 0x0000 | ⬜ | |
-| X05 | Chauffage → Clim | 36-37 | 0x000A | ⬜ | |
-| X06 | Clim → Chauffage | 36-37 | 0x000C | ⬜ | |
+| X05 | Chauffage → Clim | 32-33 | 0x000A | ⬜ | |
+| X06 | Clim → Chauffage | 32-33 | 0x000C | ⬜ | |
 | X07 | Clim Confort → Boost | 18-19 | 0x5678 | ⬜ | |
-| X08 | Vacances On | 32-33 | 0x1234 | ⬜ | |
-| X09 | Vacances Off | 32-33 | 0x0000 | ⬜ | |
+| X08 | Vacances On | 34-35 | 0x1234 | ⬜ | |
+| X09 | Vacances Off | 34-35 | 0x0000 | ⬜ | |
 | X10 | Cycle sous-codes | 2-3 | 01→41→81→C1 | ⬜ | |
 
 #### 3.1.2 Ventilation / Débits
