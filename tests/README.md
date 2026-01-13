@@ -368,10 +368,10 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 | ID | Action télécommande | Offset supposé | Valeur attendue | Résultat | Date |
 |----|---------------------|----------------|-----------------|----------|------|
-| X11 | Menu → Débit nominal ↑ | 28-29 | Incrémenté (+20) | ⬜ | |
-| X12 | Menu → Débit nominal ↓ | 28-29 | Décrémenté (-20) | ⬜ | |
-| X13 | Menu → PSE nominal ↑ | 30-31 | Incrémenté (+1) | ⬜ | |
-| X14 | Menu → PSE nominal ↓ | 30-31 | Décrémenté (-1) | ⬜ | |
+| X11 | Menu → Débit nominal ↑ | **26-27** | Incrémenté (+20) | ✅ | 2025-01-13 |
+| X12 | Menu → Débit nominal ↓ | **26-27** | Décrémenté (-20) | ✅ | 2025-01-13 |
+| X13 | Menu → PSE nominal ↑ | 28-29 | Incrémenté (+1) | ⬜ | |
+| X14 | Menu → PSE nominal ↓ | 28-29 | Décrémenté (-1) | ⬜ | |
 | X15 | Menu → Débit mini ↑ | ? | Chercher offset | ⬜ | |
 | X16 | Menu → Débit mini ↓ | ? | Chercher offset | ⬜ | |
 | X17 | Menu → PSE mini ↑ | ? | Chercher offset | ⬜ | |
