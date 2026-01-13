@@ -55,7 +55,7 @@ sudo apt install python3-serial
 | Sniff modes PAC | 10 | 10 | 0 | 0 | ✅ X01-X10 |
 | Sniff ventilation | 8 | 8 | 0 | 0 | ✅ X11-X18 |
 | Sniff date/heure | 5 | 2 | 1 | 2 | ❌ X19-X20: Date/heure non transmise |
-| Sniff consignes | 4 | 0 | 0 | 4 | ⬜ X24-X27 |
+| Sniff consignes | 4 | 1 | 3 | 0 | ✅❌ X24-X27: pas de menu consigne |
 | Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
 | Envoi modes PAC | 7 | 7 | 0 | 0 | ✅ Y01-Y07 validés Pi 2B |
 | Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
@@ -401,14 +401,16 @@ python3 tests/sniff_rs485.py --output capture.bin
 #### 3.1.4 Consignes thermostats
 
 > **Note** : Les consignes sont pilotées par thermostats radio 868MHz. Ce test vérifie si la télécommande peut aussi les modifier via 0x17.
-> **Hypothèse** : Offset 40-69 contient les consignes, pattern 0x7FFE = "pas de changement"
+> **Hypothèse initiale** : Offset 40-69 contient les consignes, pattern 0x7FFE = "pas de changement"
 
 | ID | Action télécommande | Offset supposé | Observation | Résultat | Date |
 |----|---------------------|----------------|-------------|----------|------|
-| X24 | Capture trame normale | 40-69 | Noter pattern (0x7FFE?) | ⬜ | |
-| X25 | Menu consigne zone 1 ↑ | 40-41 ? | Chercher changement | ⬜ | |
-| X26 | Menu consigne zone 1 ↓ | 40-41 ? | Chercher changement | ⬜ | |
-| X27 | Consigne différente par zone | 40-69 | Identifier mapping | ⬜ | |
+| X24 | Capture trame normale | 40-69 | Pattern 0x7FFE confirmé | ✅ | 2025-01-13 |
+| X25 | Menu consigne zone 1 ↑ | 40-41 ? | N/A - pas de menu consigne | ❌ | 2025-01-13 |
+| X26 | Menu consigne zone 1 ↓ | 40-41 ? | N/A - pas de menu consigne | ❌ | 2025-01-13 |
+| X27 | Consigne différente par zone | 40-69 | N/A - pas de menu consigne | ❌ | 2025-01-13 |
+
+> ⚠️ **Conclusion X24-X27** : La télécommande Aldes **n'a pas de menu** pour modifier les consignes thermostats. Les offsets 40-69 contiennent toujours le pattern 0x7FFE ("pas de changement"). Les consignes sont pilotées **exclusivement** par les thermostats radio 868MHz, indépendamment du protocole 0x17.
 
 #### 3.1.5 Analyse trame complète
 
