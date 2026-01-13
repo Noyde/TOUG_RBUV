@@ -68,7 +68,8 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - ✅ Lecture 40 registres via Pi Zero USB
 - ✅ Protocole 0x17 documenté et **validé par sniffing** (2025-01-13)
 - ✅ Tests sniffing X01-X20 complétés (modes, ventilation, date/heure)
-- ⚠️ Tests envoi ESP32 (Y01-Y07) à faire
+- ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
+- ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
 - ⚠️ Composant ESPHome à mettre à jour avec offsets corrigés
 - ⚠️ Projet BETA - utilisation à vos risques
 
@@ -176,14 +177,19 @@ TOUG_RBUV/
 
 > **Découvertes clés** : Flag mode service (24-25=0x3412), Type mode étendu (38-39 inclut 0x000B=Service)
 
-### Tests envoi trame 0x17 (ESP32 → PAC)
+### Tests envoi trame 0x17 (Pi 2B RS485 → PAC) ✅ VALIDÉS 2025-01-13
 
-| Test | Trame envoyée | Vérification | Statut |
-|------|---------------|--------------|--------|
-| Envoi Off | trame avec 0x0002 | R9 via USB = 5 | À tester |
-| Envoi Chauffage Confort | trame avec 0x0003/0x000C | R9 via USB = 4 | À tester |
-| Envoi Clim Confort | trame avec 0x0003/0x000A | R9 via USB = 2 | À tester |
-| Envoi Vacances | trame avec 0x1234 | Comportement PAC | À tester |
+| Test | Mode | Offset | Valeur | R9 | Statut |
+|------|------|--------|--------|-----|--------|
+| Y01 | Off | 36-37 | 0x0002 | 5 | ✅ |
+| Y02 | Chauffage Confort | 36-37, 38-39 | 0x0003, 0x000C | 4 | ✅ |
+| Y03 | Chauffage Eco | 18-19 | 0x00C8 | 4 | ✅ |
+| Y04 | Clim Confort | 38-39 | 0x000A | 2 | ✅ |
+| Y05 | Clim Boost | 20-21 | 0x5678 | 2 | ✅ |
+| Y06 | Vacances On | 34-35 | 0x1234 | - | ✅ |
+| Y07 | Retour normal | 34-35 | 0x0000 | 4 | ✅ |
+
+> **Note** : Eco/Boost non distinguables via R9 (pas de registre Modbus dédié). Script: `tools/test_send_0x17.py`
 
 ### Commandes de test
 
