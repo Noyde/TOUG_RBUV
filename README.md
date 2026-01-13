@@ -118,7 +118,8 @@ Voir [esphome/README.md](esphome/README.md)
 | Lecture registres (40) | ✅ Complété | ✅ 40/40 (2025-01-11) |
 | Mapping TOUG vs RBUV | ✅ Complété | ✅ Validé par écran PAC |
 | Tests écriture USB | ✅ Complété | ✅ 8/10 (échecs attendus) |
-| Écriture mode PAC (0x17) | 🔄 En cours | ⚠️ À revalider |
+| Sniffing protocole 0x17 | ✅ Complété | ✅ X01-X20 (2025-01-13) |
+| Envoi trames 0x17 (ESP32) | 🔄 En cours | ⚠️ Tests Y01-Y07 à faire |
 | Intégration ESPHome | 🔄 En cours | ⚠️ À revalider |
 | Écriture consignes thermostats | ❌ Impossible | ✅ Confirmé (hardware) |
 
@@ -140,7 +141,8 @@ Voir la [matrice de tests complète](tests/README.md) pour le détail des valida
 - [x] ~~Revalider tous les registres TOUG sur modèle RBUV~~ ✅ 2025-01-10
 - [x] ~~Tests écriture Modbus standard (USB)~~ ✅ 2025-01-10
 - [ ] Tests écriture Modbus standard (RS485)
-- [ ] Sniffing télécommande (protocole 0x17)
+- [x] ~~Sniffing télécommande (protocole 0x17)~~ ✅ 2025-01-13 (X01-X20)
+- [ ] Tests envoi ESP32 (Y01-Y07)
 - [ ] Tester le composant ESPHome en conditions réelles
 - [ ] Valider la stabilité long terme
 - [ ] Tests avec différentes versions firmware PAC
@@ -151,8 +153,9 @@ Voir la [matrice de tests complète](tests/README.md) pour le détail des valida
 
 1. **Consignes thermostats NON modifiables** - Hardware read-only (pilotées par radio 868MHz)
 2. **Télécommande doit être débranchée** - Collision sur le bus RS485 sinon
-3. **Protocole non officiel** - Reverse engineering, peut changer selon firmware
-4. **Testé sur UN SEUL modèle** - RBUV04F 2018
+3. **Date/heure non transmise via 0x17** - Chaque appareil maintient sa propre horloge
+4. **Protocole non officiel** - Reverse engineering, peut changer selon firmware
+5. **Testé sur UN SEUL modèle** - RBUV04F 2018
 
 ---
 
