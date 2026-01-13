@@ -54,7 +54,7 @@ sudo apt install python3-serial
 | **Protocole 0x17** | | | | | |
 | Sniff modes PAC | 10 | 10 | 0 | 0 | ✅ X01-X10 |
 | Sniff ventilation | 8 | 8 | 0 | 0 | ✅ X11-X18 |
-| Sniff date/heure | 5 | 0 | 0 | 5 | ⬜ X19-X23 |
+| Sniff date/heure | 5 | 2 | 1 | 2 | ❌ X19-X20: Date/heure non transmise |
 | Sniff consignes | 4 | 0 | 0 | 4 | ⬜ X24-X27 |
 | Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
 | Envoi modes PAC | 7 | 0 | 0 | 7 | ⬜ Y01-Y07 |
@@ -386,11 +386,13 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 | ID | Action télécommande | Offset recherché | Observation | Résultat | Date |
 |----|---------------------|------------------|-------------|----------|------|
-| X19 | Capture sans changement | 14-17 ? 20-27 ? | Noter valeurs actuelles | ⬜ | |
-| X20 | Changement heure +1h | ? | Chercher bytes modifiés | ⬜ | |
-| X21 | Changement date +1j | ? | Chercher bytes modifiés | ⬜ | |
-| X22 | Changement année | ? | Chercher bytes modifiés | ⬜ | |
-| X23 | Format encodage | ? | BCD ? Unix ? Custom ? | ⬜ | |
+| X19 | Capture sans changement | - | Données stables, pas de time | ✅ | 2025-01-13 |
+| X20 | Changement heure +1h | - | **Aucun changement données** | ❌ | 2025-01-13 |
+| X21 | Changement date +1j | - | N/A (date non transmise) | ⬜ | |
+| X22 | Changement année | - | N/A (date non transmise) | ⬜ | |
+| X23 | Format encodage | - | N/A (date non transmise) | ⬜ | |
+
+> ⚠️ **Conclusion X19-X20** : La date/heure n'est **PAS transmise** dans la trame 0x17. La télécommande stocke l'heure localement. Tests X21-X23 non pertinents.
 
 #### 3.1.4 Consignes thermostats
 
