@@ -4,6 +4,8 @@
 ![MQTT Discovery](https://img.shields.io/badge/MQTT-Discovery-purple)
 ![ESPHome](https://img.shields.io/badge/ESPHome-component-000000?logo=esphome)
 ![Status](https://img.shields.io/badge/status-beta-orange)
+![Home Assistant](https://img.shields.io/badge/compatible-Home%20Assistant-41BDF5?logo=homeassistant)
+
 
 ---
 
