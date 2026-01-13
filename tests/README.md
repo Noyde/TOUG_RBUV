@@ -354,7 +354,7 @@ python3 tests/sniff_rs485.py --output capture.bin
 | X01 | Chauffage Confort → Off | **36-37** | 0x0002 | ✅ | 2025-01-13 |
 | X02 | Off → Chauffage Confort | 36-37 | 0x0003 | ✅ | 2025-01-13 |
 | X03 | Confort → Eco | 18-19 | 0x00C8 | ✅ | 2025-01-13 |
-| X04 | Eco → Confort | 18-19 | 0x0000 | ⬜ | |
+| X04 | Eco → Confort | 18-19 | 0x0000 | ✅ | 2025-01-13 |
 | X05 | Chauffage → Clim | 32-33 | 0x000A | ⬜ | |
 | X06 | Clim → Chauffage | 32-33 | 0x000C | ⬜ | |
 | X07 | Clim Confort → Boost | 18-19 | 0x5678 | ⬜ | |
