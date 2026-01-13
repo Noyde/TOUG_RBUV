@@ -46,6 +46,7 @@ sudo apt install python3-serial
 | Registres guix77 | 5 | 5 | 0 | 0 | ✅ Existent, sens différent |
 | Compteurs temps | 2 | 2 | 0 | 0 | ✅ R131/R136 validés |
 | Scan R0-R500 | 203 | 40 | 0 | 163 | 🔍 À identifier |
+| Scan R1000-R1033 | 20 | 0 | 0 | 20 | 🔍 Zone calibration ? |
 | **Écriture Modbus** | | | | | |
 | USB (standard) | 8 | 0 | 8 | 0 | ✅ Échec attendu |
 | USB FC16 | 9 | 0 | 9 | 0 | ✅ Accepté mais ignoré (USB read-only) |

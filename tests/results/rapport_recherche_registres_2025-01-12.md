@@ -345,6 +345,51 @@ Test effectué en écrivant une valeur DIFFÉRENTE (254) pour vérifier si l'éc
 
 ---
 
+## Scan R500-R2000
+
+### R500-R1000
+Aucun registre non-nul trouvé.
+
+### R1000-R1033 - Zone calibration/configuration
+
+**20 registres découverts :**
+
+| Registre | Valeur | Hex | Hypothèse |
+|----------|--------|-----|-----------|
+| R1000 | 1 | 0x0001 | Flag/version |
+| R1002 | 7 | | Paramètre config |
+| R1003 | 179 | | ? |
+| R1004 | 10 | | ? |
+| R1005 | 168 | | ? |
+| R1006 | 255 | 0xFF | Max/désactivé |
+| R1009 | 128 | 0x80 | Flag bit 7 |
+| R1012 | 28 | | Pression ? Offset ? |
+| R1014 | 255 | 0xFF | Max/désactivé |
+| R1015 | 255 | 0xFF | Max/désactivé |
+| R1016 | 5 | | Niveau ? |
+| R1020 | 1 | | Compteur ? |
+| R1021 | 14 | | Compteur ? |
+| R1022 | 65415 | -121 signé | **Correction/offset** |
+| R1023 | 65511 | -25 signé | **Correction/offset** |
+| R1024 | 65523 | -13 signé | **Correction/offset** |
+| R1030 | 48 | | % ? Niveau ? |
+| R1031 | 64 | | % ? |
+| R1032 | 96 | | % ? |
+| R1033 | 84 | | % ? |
+
+**Observations :**
+- Zone R1000-R1033 = probablement **paramètres de calibration/configuration**
+- R1022-R1024 = valeurs négatives signées = **corrections température ?**
+- R1030-R1033 = ressemblent à des pourcentages
+
+### R1033-R2000
+Aucun registre non-nul trouvé.
+
+### R2000-R5000
+Aucun registre non-nul trouvé.
+
+---
+
 ## Pistes pour modification consignes thermostats
 
 ### Limitation connue
