@@ -53,7 +53,7 @@ sudo apt install python3-serial
 | RS485 (standard) | 2 | 0 | 0 | 2 | ⬜ W03-W04 |
 | **Protocole 0x17** | | | | | |
 | Sniff modes PAC | 10 | 10 | 0 | 0 | ✅ X01-X10 |
-| Sniff ventilation | 8 | 6 | 0 | 2 | 🔄 X11-X16 ✅, X17-X18 ⬜ |
+| Sniff ventilation | 8 | 8 | 0 | 0 | ✅ X11-X18 |
 | Sniff date/heure | 5 | 0 | 0 | 5 | ⬜ X19-X23 |
 | Sniff consignes | 4 | 0 | 0 | 4 | ⬜ X24-X27 |
 | Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
@@ -310,7 +310,7 @@ La PAC peut accepter la commande mais ignorer le contenu.
 | **26-27** | 2 | **Débit nominal** | ✅ 0x0384=900, 0x0370=880, 0x0348=840 m³/h |
 | **28-29** | 2 | **PSE nominal** | ✅ 0x0017=23, 0x0018=24 Pa |
 | **30-31** | 2 | **Débit 1 bouche** | ✅ 0x00F0=240, 0x00DC=220 m³/h |
-| **32-33** | 2 | **Type mode** | ✅ 0x000C=Chauffage, 0x000A=Clim |
+| **32-33** | 2 | **PSE mini** | ✅ 0x000C=12, 0x000B=11 Pa |
 | **34-35** | 2 | **Vacances** | 0x0000=Off, 0x1234=On |
 | **36-37** | 2 | **On/Off** | ✅ 0x0002=Off, 0x0003=On |
 | **38-39** | 2 | **Type mode étendu** | ✅ 0x000A=Clim, 0x000B=Service, 0x000C=Chauffage |
@@ -376,8 +376,8 @@ python3 tests/sniff_rs485.py --output capture.bin
 | X14 | Menu → PSE nominal ↓ | **28-29** | Décrémenté (-1) | ✅ | 2025-01-13 |
 | X15 | Menu → Débit 1 bouche ↑ | **30-31** | Incrémenté (+20) | ✅ | 2025-01-13 |
 | X16 | Menu → Débit 1 bouche ↓ | **30-31** | Décrémenté (-20) | ✅ | 2025-01-13 |
-| X17 | Menu → PSE mini ↑ | ? | Chercher offset | ⬜ | |
-| X18 | Menu → PSE mini ↓ | ? | Chercher offset | ⬜ | |
+| X17 | Menu → PSE mini ↑ | **32-33** | Incrémenté (+1) | ✅ | 2025-01-13 |
+| X18 | Menu → PSE mini ↓ | **32-33** | Décrémenté (-1) | ✅ | 2025-01-13 |
 
 #### 3.1.3 Date/Heure
 
