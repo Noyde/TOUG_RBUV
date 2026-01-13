@@ -27,3 +27,4 @@ tests/results/*
 !tests/results/rapport_recherche_*.md
 !tests/results/sniff_aide_memoire.md
 !tests/results/sniff_X*_*.md
+!tests/results/sniff_Y*_*.md
