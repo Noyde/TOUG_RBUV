@@ -1,0 +1,593 @@
+# =============================================================================
+# Dashboard Home Assistant pour PAC Aldes T.One AIR
+# =============================================================================
+# Auteur: Communauté HACF / Projet TOUG
+# Version: 1.0
+# Licence: MIT
+#
+# Prérequis:
+#   - HACS installé
+#   - Mushroom Cards (via HACS)
+#
+# Installation:
+#   1. Paramètres → Tableaux de bord → Ajouter un tableau de bord
+#   2. 3 points → Modifier → 3 points → Éditeur YAML brut
+#   3. Coller ce contenu
+#   4. Adapter les noms d'entités à votre configuration
+#
+# Notes:
+#   - Les noms d'entités utilisent le préfixe "sensor.pac_aldes_t_one_air_"
+#   - Adaptez les noms de zones (Zone 1-6) à vos pièces
+#   - Les seuils sont calibrés pour le modèle T.One AIR 04
+# =============================================================================
+
+views:
+  # =============================================================================
+  # ONGLET 1 - APERÇU
+  # =============================================================================
+  - title: Aperçu
+    path: apercu
+    icon: mdi:home
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🌡️ État Général"
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Mode PAC
+                secondary: "{{ states('sensor.pac_aldes_t_one_air_mode_pac_texte') }}"
+                icon: mdi:hvac
+                icon_color: >
+                  {% set mode = states('sensor.pac_aldes_t_one_air_mode_pac') | float %}
+                  {% if mode == 4 %}orange{% elif mode == 2 %}blue{% elif mode == 5 %}grey{% else %}green{% endif %}
+              - type: custom:mushroom-template-card
+                primary: Extérieur
+                secondary: "{{ states('sensor.pac_aldes_t_one_air_temperature_exterieure') }}°C"
+                icon: mdi:home-thermometer-outline
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_exterieure') | float %}
+                  {% if temp < 5 %}blue{% elif temp > 25 %}red{% else %}green{% endif %}
+              - type: custom:mushroom-template-card
+                primary: Durée ON
+                secondary: "{{ states('sensor.pac_aldes_t_one_air_duree_on') }} min"
+                icon: mdi:clock-outline
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🏠 Températures par pièce"
+          # Rangée 1 : Zone 1 et Zone 2
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Zone 1
+                secondary: >
+                  {{ states('sensor.pac_aldes_t_one_air_temperature_zone_1') }}°C /
+                  {{ states('sensor.pac_aldes_t_one_air_consigne_zone_1') }}°C
+                icon: mdi:sofa
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_zone_1') | float %}
+                  {% set cons = states('sensor.pac_aldes_t_one_air_consigne_zone_1') | float %}
+                  {% if (temp - cons) | abs < 0.5 %}green{% elif temp > cons %}red{% else %}blue{% endif %}
+              - type: custom:mushroom-template-card
+                primary: Zone 2
+                secondary: >
+                  {{ states('sensor.pac_aldes_t_one_air_temperature_zone_2') }}°C /
+                  {{ states('sensor.pac_aldes_t_one_air_consigne_zone_2') }}°C
+                icon: mdi:bed-king
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_zone_2') | float %}
+                  {% set cons = states('sensor.pac_aldes_t_one_air_consigne_zone_2') | float %}
+                  {% if (temp - cons) | abs < 0.5 %}green{% elif temp > cons %}red{% else %}blue{% endif %}
+          # Rangée 2 : Zone 3 et Zone 4
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Zone 3
+                secondary: >
+                  {{ states('sensor.pac_aldes_t_one_air_temperature_zone_3') }}°C /
+                  {{ states('sensor.pac_aldes_t_one_air_consigne_zone_3') }}°C
+                icon: mdi:desk
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_zone_3') | float %}
+                  {% set cons = states('sensor.pac_aldes_t_one_air_consigne_zone_3') | float %}
+                  {% if (temp - cons) | abs < 0.5 %}green{% elif temp > cons %}red{% else %}blue{% endif %}
+              - type: custom:mushroom-template-card
+                primary: Zone 4
+                secondary: >
+                  {{ states('sensor.pac_aldes_t_one_air_temperature_zone_4') }}°C /
+                  {{ states('sensor.pac_aldes_t_one_air_consigne_zone_4') }}°C
+                icon: mdi:bed
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_zone_4') | float %}
+                  {% set cons = states('sensor.pac_aldes_t_one_air_consigne_zone_4') | float %}
+                  {% if (temp - cons) | abs < 0.5 %}green{% elif temp > cons %}red{% else %}blue{% endif %}
+          # Rangée 3 : Zone 5 et Air Repris
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Zone 5
+                secondary: >
+                  {{ states('sensor.pac_aldes_t_one_air_temperature_zone_5') }}°C /
+                  {{ states('sensor.pac_aldes_t_one_air_consigne_zone_5') }}°C
+                icon: mdi:bed
+                icon_color: >
+                  {% set temp = states('sensor.pac_aldes_t_one_air_temperature_zone_5') | float %}
+                  {% set cons = states('sensor.pac_aldes_t_one_air_consigne_zone_5') | float %}
+                  {% if (temp - cons) | abs < 0.5 %}green{% elif temp > cons %}red{% else %}blue{% endif %}
+              - type: custom:mushroom-template-card
+                primary: Air Repris
+                secondary: "{{ states('sensor.pac_aldes_t_one_air_temperature_air_repris_ui') }}°C"
+                icon: mdi:weather-windy
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "⚡ État PAC"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_frequence_compresseur
+                name: Compresseur
+                unit: Hz
+                min: 0
+                max: 100
+                severity:
+                  green: 0
+                  yellow: 70
+                  red: 90
+                needle: true
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_pression_statique_ext
+                name: Pression
+                unit: Pa
+                min: 0
+                max: 100
+                severity:
+                  green: 0
+                  yellow: 60
+                  red: 80
+                needle: true
+
+  # =============================================================================
+  # ONGLET 2 - TEMPÉRATURES
+  # =============================================================================
+  - title: Températures
+    path: temperatures
+    icon: mdi:thermometer
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🏠 Températures par pièce"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_zone_1
+                name: Zone 1
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 20
+                    color: '#4CAF50'
+                  - from: 23
+                    color: '#FF9800'
+                  - from: 26
+                    color: '#F44336'
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_zone_2
+                name: Zone 2
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 18
+                    color: '#4CAF50'
+                  - from: 21
+                    color: '#FF9800'
+                  - from: 24
+                    color: '#F44336'
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_zone_3
+                name: Zone 3
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 20
+                    color: '#4CAF50'
+                  - from: 23
+                    color: '#FF9800'
+                  - from: 26
+                    color: '#F44336'
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_zone_4
+                name: Zone 4
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 19
+                    color: '#4CAF50'
+                  - from: 22
+                    color: '#FF9800'
+                  - from: 25
+                    color: '#F44336'
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_zone_5
+                name: Zone 5
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 19
+                    color: '#4CAF50'
+                  - from: 22
+                    color: '#FF9800'
+                  - from: 25
+                    color: '#F44336'
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_air_repris_ui
+                name: Air Repris
+                unit: °C
+                min: 15
+                max: 28
+                needle: true
+                segments:
+                  - from: 15
+                    color: '#2196F3'
+                  - from: 18
+                    color: '#4CAF50'
+                  - from: 24
+                    color: '#FF9800'
+                  - from: 27
+                    color: '#F44336'
+          - type: custom:mushroom-title-card
+            title: "🎯 Consignes actuelles"
+          - type: glance
+            columns: 5
+            show_name: true
+            show_state: true
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_consigne_zone_1
+                name: Zone 1
+              - entity: sensor.pac_aldes_t_one_air_consigne_zone_2
+                name: Zone 2
+              - entity: sensor.pac_aldes_t_one_air_consigne_zone_3
+                name: Zone 3
+              - entity: sensor.pac_aldes_t_one_air_consigne_zone_4
+                name: Zone 4
+              - entity: sensor.pac_aldes_t_one_air_consigne_zone_5
+                name: Zone 5
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🔧 Températures PAC"
+          - type: entities
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_temperature_exterieure
+                name: Extérieure
+              - entity: sensor.pac_aldes_t_one_air_temperature_air_repris_ui
+                name: Air Repris UI
+              - entity: sensor.pac_aldes_t_one_air_temperature_echangeur_ui
+                name: Échangeur UI
+              - entity: sensor.pac_aldes_t_one_air_temperature_echangeur_ue
+                name: Échangeur UE
+              - entity: sensor.pac_aldes_t_one_air_temperature_sortie_compresseur
+                name: Sortie Compresseur
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "📈 Historique 24h"
+          - type: history-graph
+            title: Températures Pièces
+            hours_to_show: 24
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_1
+                name: Zone 1
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_2
+                name: Zone 2
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_3
+                name: Zone 3
+              - entity: sensor.pac_aldes_t_one_air_temperature_exterieure
+                name: Extérieur
+
+  # =============================================================================
+  # ONGLET 3 - TECHNIQUE
+  # =============================================================================
+  - title: Technique
+    path: technique
+    icon: mdi:cog
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🔥 Compresseur"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_frequence_compresseur
+                name: Fréquence
+                unit: Hz
+                min: 0
+                max: 100
+                severity:
+                  green: 0
+                  yellow: 70
+                  red: 90
+                needle: true
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_temperature_sortie_compresseur
+                name: T° Sortie
+                unit: °C
+                min: 0
+                max: 120
+                severity:
+                  green: 0
+                  yellow: 80
+                  red: 100
+                needle: true
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_consigne_frequence
+                name: Consigne Freq
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_heures_compresseur
+                name: Heures Total
+                icon: mdi:timer
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_courant_compresseur
+                name: Courant
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_protection_compresseur
+                name: Protection
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "💨 Ventilation"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_vitesse_ventilateur
+                name: Vitesse
+                unit: rpm
+                min: 0
+                max: 1000
+                severity:
+                  green: 0
+                  yellow: 700
+                  red: 800
+                needle: true
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_pression_statique_ext
+                name: Pression Statique
+                unit: Pa
+                min: 0
+                max: 100
+                severity:
+                  green: 0
+                  yellow: 60
+                  red: 80
+                needle: true
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_consigne_ventilateur
+                name: Consigne
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_heures_ventilateur_ui
+                name: Heures Total
+                icon: mdi:timer
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_niveau_ventilation_ue
+                name: Niveau UE
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🔧 Vannes EEV"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_eev1
+                name: EEV1
+                unit: Pls
+                min: 0
+                max: 500
+                severity:
+                  red: 0
+                  yellow: 50
+                  green: 100
+                needle: true
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_eev2
+                name: EEV2
+                unit: Pls
+                min: 0
+                max: 500
+                severity:
+                  red: 0
+                  yellow: 50
+                  green: 100
+                needle: true
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "📊 Débits / Pressions"
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_pse_debit_nominal
+                name: PSE Nominal
+                unit: Pa
+                min: 0
+                max: 80
+                severity:
+                  green: 0
+                  yellow: 50
+                  red: 60
+                needle: true
+              - type: gauge
+                entity: sensor.pac_aldes_t_one_air_pse_debit_mini
+                name: PSE Mini
+                unit: Pa
+                min: 0
+                max: 50
+                severity:
+                  green: 0
+                  yellow: 25
+                  red: 35
+                needle: true
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_debit_1_bouche
+                name: Débit 1 Bouche
+              - type: entity
+                entity: sensor.pac_aldes_t_one_air_debit_nominal
+                name: Débit Nominal
+
+  # =============================================================================
+  # ONGLET 4 - HISTORIQUES
+  # =============================================================================
+  - title: Historiques
+    path: historiques
+    icon: mdi:chart-line
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🌡️ Températures Pièces (24h)"
+          - type: history-graph
+            hours_to_show: 24
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_1
+                name: Zone 1
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_2
+                name: Zone 2
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_3
+                name: Zone 3
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_4
+                name: Zone 4
+              - entity: sensor.pac_aldes_t_one_air_temperature_zone_5
+                name: Zone 5
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🔧 Températures PAC (24h)"
+          - type: history-graph
+            hours_to_show: 24
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_temperature_exterieure
+                name: Extérieur
+              - entity: sensor.pac_aldes_t_one_air_temperature_echangeur_ui
+                name: Échangeur UI
+              - entity: sensor.pac_aldes_t_one_air_temperature_echangeur_ue
+                name: Échangeur UE
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🔥 Compresseur (24h)"
+          - type: history-graph
+            hours_to_show: 24
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_frequence_compresseur
+                name: Fréquence
+              - entity: sensor.pac_aldes_t_one_air_temperature_sortie_compresseur
+                name: T° Sortie
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "💨 Ventilation (24h)"
+          - type: history-graph
+            hours_to_show: 24
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_vitesse_ventilateur
+                name: Vitesse
+              - entity: sensor.pac_aldes_t_one_air_pression_statique_ext
+                name: Pression
+
+  # =============================================================================
+  # ONGLET 5 - SYSTÈME
+  # =============================================================================
+  - title: Système
+    path: systeme
+    icon: mdi:information
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "ℹ️ Informations PAC"
+          - type: entities
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_mode_pac_texte
+                name: Mode PAC
+              - entity: sensor.pac_aldes_t_one_air_mode_pac
+                name: Mode PAC (code)
+              - entity: sensor.pac_aldes_t_one_air_version_firmware
+                name: Version Firmware
+              - entity: sensor.pac_aldes_t_one_air_duree_on
+                name: Durée ON
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "⏱️ Compteurs"
+          - type: entities
+            entities:
+              - entity: sensor.pac_aldes_t_one_air_heures_compresseur
+                name: Heures Compresseur
+                icon: mdi:timer
+              - entity: sensor.pac_aldes_t_one_air_heures_ventilateur_ui
+                name: Heures Ventilateur
+                icon: mdi:timer
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: "🎯 Seuils d'alerte T.One AIR"
+          - type: markdown
+            content: |
+              | Paramètre | Normal | Attention | Critique |
+              |-----------|--------|-----------|----------|
+              | **Fréquence Compresseur** | 20-70 Hz | >70 Hz | >90 Hz |
+              | **T° Sortie Compresseur** | 40-70°C | >80°C | >100°C |
+              | **Vitesse Ventilateur** | 300-600 rpm | >700 rpm | >800 rpm |
+              | **Pression Statique** | 15-50 Pa | >60 Pa | >80 Pa |
+              | **EEV** | 100-400 Pls | <50 / >450 Pls | <20 / >480 Pls |
+              | **T° Air Repris** | 18-26°C | <15 / >28°C | <10 / >32°C |
+              | **T° Échangeur UI (chaud)** | 30-50°C | >55°C | >60°C |
+              | **PSE Nominal** | 15-50 Pa | >50 Pa | >60 Pa |
+              | **PSE Mini** | 10-25 Pa | >25 Pa | >35 Pa |
