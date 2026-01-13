@@ -11,6 +11,7 @@ import logging
 import time
 import os
 import sys
+import glob
 import serial
 import paho.mqtt.client as mqtt
 
@@ -40,8 +41,67 @@ MQTT_PORT = CONFIG["mqtt"].get("port", 1883)
 MQTT_USER = CONFIG["mqtt"]["user"]
 MQTT_PASSWORD = CONFIG["mqtt"]["password"]
 
-SERIAL_PORT = CONFIG["serial"]["port"]
+SERIAL_PORT_CONFIG = CONFIG["serial"].get("port", "auto")
 SERIAL_BAUDRATE = CONFIG["serial"]["baudrate"]
+
+def detect_serial_port():
+    """Détecte automatiquement le port série de la PAC Aldes"""
+    # Si port spécifié et existe, l'utiliser
+    if SERIAL_PORT_CONFIG and SERIAL_PORT_CONFIG != "auto":
+        if os.path.exists(SERIAL_PORT_CONFIG):
+            return SERIAL_PORT_CONFIG
+        logging.warning(f"⚠️ Port configuré {SERIAL_PORT_CONFIG} non trouvé, recherche auto...")
+
+    # Rechercher les ports ttyACM* (USB CDC)
+    ports = sorted(glob.glob('/dev/ttyACM*'))
+    if not ports:
+        logging.error("❌ Aucun port /dev/ttyACM* trouvé")
+        return None
+
+    logging.info(f"🔍 Ports détectés: {', '.join(ports)}")
+
+    # Tester chaque port
+    for port in ports:
+        try:
+            logging.info(f"🔍 Test {port}...")
+            ser = serial.Serial(
+                port=port,
+                baudrate=SERIAL_BAUDRATE,
+                parity=serial.PARITY_EVEN,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=1
+            )
+
+            # Tenter lecture registre 1 (version firmware)
+            request = bytes([0x01, 0x03, 0x00, 0x01, 0x00, 0x01])
+            crc = 0xFFFF
+            for b in request:
+                crc ^= b
+                for _ in range(8):
+                    crc = (crc >> 1) ^ 0xA001 if crc & 1 else crc >> 1
+            request += bytes([crc & 0xFF, crc >> 8])
+
+            ser.reset_input_buffer()
+            ser.write(request)
+            time.sleep(0.2)
+            response = ser.read(7)
+            ser.close()
+
+            if len(response) >= 5 and response[0] == 0x01 and response[1] == 0x03:
+                version = (response[3] << 8) | response[4]
+                if 1000 <= version <= 9999:  # Versions firmware valides
+                    logging.info(f"✅ PAC détectée sur {port} (firmware {version})")
+                    return port
+        except Exception as e:
+            logging.debug(f"   {port}: {e}")
+            continue
+
+    # Si aucun port validé, utiliser le premier disponible
+    logging.warning(f"⚠️ Aucun port validé, utilisation de {ports[0]}")
+    return ports[0]
+
+SERIAL_PORT = detect_serial_port()
 
 READ_INTERVAL = CONFIG.get("read_interval", 30)
 
@@ -319,8 +379,12 @@ def main():
 
     logging.info(f"📁 Config: {CONFIG_FILE}")
     logging.info(f"🔌 Broker: {MQTT_BROKER}:{MQTT_PORT}")
-    logging.info(f"📡 Port série: {SERIAL_PORT} @ {SERIAL_BAUDRATE} bauds")
+    logging.info(f"📡 Port série: {SERIAL_PORT or 'NON DÉTECTÉ'} @ {SERIAL_BAUDRATE} bauds")
     logging.info(f"🏠 Zones: {', '.join(ZONES.values())}")
+
+    if not SERIAL_PORT:
+        logging.error("❌ Aucun port série détecté. Vérifiez la connexion USB à la PAC.")
+        return
 
     # Connexion MQTT
     mqtt_client = mqtt.Client()

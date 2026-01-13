@@ -6,7 +6,7 @@
     "password": "votre_password"
   },
   "serial": {
-    "port": "/dev/ttyACM1",
+    "port": "auto",
     "baudrate": 1200
   },
   "read_interval": 30,
