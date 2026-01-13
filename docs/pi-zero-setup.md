@@ -120,7 +120,7 @@ Résultat attendu : `/dev/ttyACM1`
 
 | Paramètre | Valeur |
 |-----------|--------|
-| **Port série** | `/dev/ttyACM1` |
+| **Port série** | `auto` (auto-détection) ou `/dev/ttyACM1` |
 | **Baudrate** | 1200 |
 | **Parité** | EVEN |
 | **Stop bits** | 1 |
@@ -162,7 +162,7 @@ nano config.json
     "password": "votre_password"
   },
   "serial": {
-    "port": "/dev/ttyACM1",
+    "port": "auto",
     "baudrate": 1200
   },
   "read_interval": 30,
@@ -184,7 +184,7 @@ nano config.json
 | | `port` | Port MQTT (1883 par défaut) |
 | | `user` | Utilisateur MQTT |
 | | `password` | Mot de passe MQTT |
-| **serial** | `port` | Port série USB (`/dev/ttyACM1` généralement) |
+| **serial** | `port` | `"auto"` pour auto-détection ou chemin explicite (`/dev/ttyACM1`) |
 | | `baudrate` | Vitesse communication (toujours `1200` pour RBUV) |
 | **read_interval** | | Intervalle de lecture en secondes (30 recommandé) |
 | **zones** | `zone1` | Nom Zone 1 (R20/R21 - même thermostat) |
