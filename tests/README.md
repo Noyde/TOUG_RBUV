@@ -30,7 +30,7 @@ sudo apt install python3-serial
 
 ---
 
-## Résumé des tests (2025-01-12)
+## Résumé des tests (2025-01-13)
 
 | Groupe | Total | OK | KO | À faire | Notes |
 |--------|-------|----|----|---------|-------|
@@ -57,9 +57,9 @@ sudo apt install python3-serial
 | Sniff date/heure | 5 | 2 | 1 | 2 | ❌ X19-X20: Date/heure non transmise |
 | Sniff consignes | 4 | 0 | 0 | 4 | ⬜ X24-X27 |
 | Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
-| Envoi modes PAC | 7 | 0 | 0 | 7 | ⬜ Y01-Y07 |
+| Envoi modes PAC | 7 | 7 | 0 | 0 | ✅ Y01-Y07 validés Pi 2B |
 | Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
-| Envoi date/heure | 2 | 0 | 0 | 2 | ⬜ Y14-Y15 |
+| Envoi date/heure | 2 | 0 | 0 | 2 | ❌ Y14-Y15 (date non transmise) |
 | Réponses PAC | 5 | 0 | 0 | 5 | ⬜ Z01-Z05 |
 
 ---
@@ -287,6 +287,10 @@ La PAC peut accepter la commande mais ignorer le contenu.
 
 ## 3. Tests protocole 0x17 (spécifique RBUV)
 
+> **IMPORTANT - Découverte 2025-01-13** : Le protocole 0x17 contrôle **uniquement les MODES** (On/Off, Chauffage/Clim, Eco/Boost, Vacances).
+> La **régulation des zones** (ouverture/fermeture des bouches motorisées) est gérée **indépendamment** par les thermostats 868MHz qui communiquent directement avec le régulateur PAC.
+> Les bouches réagissent aux changements de consignes thermostats **même sans trames 0x17** et **même sans télécommande branchée**.
+
 ### 3.0 Structure trame 0x17 (74 bytes)
 
 > **Référence** : Validé par sniffing 2025-01-13
@@ -303,8 +307,8 @@ La PAC peut accepter la commande mais ignorer le contenu.
 | 12-13 | 2 | Version | 0x1804 |
 | 14-15 | 2 | Compteur | Incrémente à chaque trame |
 | 16-17 | 2 | ? | 0xF67A observé |
-| **18-19** | 2 | **Niveau** | 0x0000=Confort, 0x00C8=Eco, 0x5678=Boost |
-| **20-21** | 2 | **Boost** | ✅ 0x0000=Normal, 0x5678=Boost |
+| **18-19** | 2 | **Niveau** | 0x0000=Confort, 0x00C8=Eco |
+| **20-21** | 2 | **Boost** | 0x0000=Normal, 0x5678=Boost |
 | 22-23 | 2 | Padding | 0x0000 |
 | **24-25** | 2 | **Flag mode service** | ✅ 0x0000=Normal, 0x3412=Service |
 | **26-27** | 2 | **Débit nominal** | ✅ 0x0384=900, 0x0370=880, 0x0348=840 m³/h |
@@ -419,17 +423,22 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 **Prérequis** : Télécommande DÉBRANCHÉE
 
-#### 3.2.1 Modes PAC (implémenté dans aldes_tone.h)
+#### 3.2.1 Modes PAC ✅ VALIDÉS (Pi 2B RS485 → PAC) 2025-01-13
 
-| ID | Mode envoyé | Trame (niveau, vacances, onoff, type) | Vérif R9 USB | Résultat | Date |
-|----|-------------|---------------------------------------|--------------|----------|------|
-| Y01 | Off | (0x0000, 0x0000, 0x0002, 0x000C) | R9 = 5 | ⬜ | |
-| Y02 | Chauffage Confort | (0x0000, 0x0000, 0x0003, 0x000C) | R9 = 4 | ⬜ | |
-| Y03 | Chauffage Eco | (0x00C8, 0x0000, 0x0003, 0x000C) | R9 = 4 | ⬜ | |
-| Y04 | Clim Confort | (0x0000, 0x0000, 0x0003, 0x000A) | R9 = 2 | ⬜ | |
-| Y05 | Clim Boost | (0x5678, 0x0000, 0x0003, 0x000A) | R9 = 2 | ⬜ | |
-| Y06 | Vacances On | (0x0000, 0x1234, 0x0003, 0x000C) | Comportement ? | ⬜ | |
-| Y07 | Vacances Off | (0x0000, 0x0000, 0x0003, 0x000C) | Retour normal | ⬜ | |
+> **Script** : `tools/test_send_0x17.py`
+> **Paramètres send_frame** : (niveau, boost, vacances, onoff, type_mode)
+
+| ID | Mode envoyé | Trame | Vérif R9 USB | Résultat | Date |
+|----|-------------|-------|--------------|----------|------|
+| Y01 | Off | (0x0000, 0x0000, 0x0000, 0x0002, 0x000C) | R9 = 5 | ✅ | 2025-01-13 |
+| Y02 | Chauffage Confort | (0x0000, 0x0000, 0x0000, 0x0003, 0x000C) | R9 = 4 | ✅ | 2025-01-13 |
+| Y03 | Chauffage Eco | (0x00C8, 0x0000, 0x0000, 0x0003, 0x000C) | R9 = 4 | ✅ | 2025-01-13 |
+| Y04 | Clim Confort | (0x0000, 0x0000, 0x0000, 0x0003, 0x000A) | R9 = 2 | ✅ | 2025-01-13 |
+| Y05 | Clim Boost | (0x0000, 0x5678, 0x0000, 0x0003, 0x000A) | R9 = 2 | ✅ | 2025-01-13 |
+| Y06 | Vacances On | (0x0000, 0x0000, 0x1234, 0x0003, 0x000C) | Mode vacances | ✅ | 2025-01-13 |
+| Y07 | Vacances Off | (0x0000, 0x0000, 0x0000, 0x0003, 0x000C) | R9 = 4 | ✅ | 2025-01-13 |
+
+> **Note** : Eco/Boost non distinguables via R9 (pas de registre Modbus dédié). Validé via comportement PAC.
 
 #### 3.2.2 Ventilation / Débits (à implémenter)
 
@@ -551,4 +560,4 @@ Fichier : `results/YYYY-MM-DD_ID-description.md`
 
 ---
 
-*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-12*
+*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-13*
