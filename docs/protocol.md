@@ -31,99 +31,122 @@ L'écriture via protocole 0x17 ne fonctionne que sur le **bus télécommande** (
 
 ---
 
-## 2. Structure de la trame (74 bytes)
-```
-Offset  Taille  Description                 Valeurs
-------  ------  --------------------------  ------------------
-0       1       Adresse Modbus              0x01
-1       1       Fonction                    0x17
-2-3     2       Sous-code séquence          0x00, 0x41/0x01/0x81/0xC1
-4-5     2       Longueur                    0x00, 0x40
-6-7     2       Constante                   0x00, 0x57
-8-9     2       Constante                   0x00, 0x1F
-10-11   2       Signature "sp"              0x73, 0x70
-12-13   2       Version                     0x18, 0x04
-14-17   4       Réservé                     0x00 x 4
-18-19   2       Niveau (Eco/Confort/Boost)  Voir section 3
-20-27   8       Padding                     0x00 x 8
-28-29   2       Débit nominal               Valeur m3/h
-30-31   2       PSE débit nominal           Valeur Pa
-32-33   2       Débit mini / Vacances       Valeur m3/h ou flag
-34-35   2       PSE mini / On-Off           Valeur Pa ou flag
-36-37   2       Type mode (Chaud/Clim)      Voir section 3
-38-39   2       Padding                     0x00, 0x00
-40-69   30      Pattern fixe                Consignes (non modifiables)
-70-71   2       Padding                     0x00, 0x00
-72-73   2       CRC16 Modbus                Calculé sur bytes 0-71
-```
+## 2. Structure de la trame (74 bytes) - VALIDÉ 2025-01-13
+
+> ⚠️ **Structure validée par sniffing télécommande** (tests X01-X20)
+
+| Offset | Taille | Description | Valeurs |
+|--------|--------|-------------|---------|
+| 0 | 1 | Adresse Modbus | 0x01 |
+| 1 | 1 | Fonction | 0x17 |
+| 2-3 | 2 | Sous-code séquence | Cycle: 0x0001→0x0041→0x0081→0x00C1 |
+| 4-5 | 2 | Longueur | 0x0040 (64) |
+| 6-7 | 2 | Constante | 0x0057 |
+| 8-9 | 2 | Constante | 0x001F |
+| 10-11 | 2 | Signature "sp" | 0x7370 |
+| 12-13 | 2 | Version | 0x1804 |
+| 14-15 | 2 | Compteur | Incrémente à chaque trame |
+| 16-17 | 2 | Réservé | 0xF67A observé |
+| **18-19** | 2 | **Niveau** | 0x0000=Confort, 0x00C8=Eco |
+| **20-21** | 2 | **Boost** | 0x0000=Normal, 0x5678=Boost |
+| 22-23 | 2 | Padding | 0x0000 |
+| **24-25** | 2 | **Flag mode service** | 0x0000=Normal, 0x3412=Installateur |
+| **26-27** | 2 | **Débit nominal** | m³/h (ex: 0x0384=900) |
+| **28-29** | 2 | **PSE nominal** | Pa (ex: 0x0017=23) |
+| **30-31** | 2 | **Débit 1 bouche** | m³/h (ex: 0x00F0=240) |
+| **32-33** | 2 | **PSE mini** | Pa (ex: 0x000C=12) |
+| **34-35** | 2 | **Vacances** | 0x0000=Off, 0x1234=On |
+| **36-37** | 2 | **On/Off** | 0x0002=Off, 0x0003=On |
+| **38-39** | 2 | **Type mode** | 0x000A=Clim, 0x000B=Service, 0x000C=Chauffage |
+| 40-69 | 30 | Consignes zones | Pattern 0x7FFE = pas de changement |
+| 70-71 | 2 | Padding | 0x0000 |
+| 72-73 | 2 | CRC16 Modbus | Calculé sur bytes 0-71 |
 
 ---
 
 ## 3. Valeurs des champs de contrôle
 
-### Offset 18-19 : Niveau
+### Offset 18-19 : Niveau (Eco/Confort)
 
 | Valeur hex | Mode |
 |------------|------|
 | 0x0000 | Confort |
 | 0x00C8 | Eco |
+
+### Offset 20-21 : Boost
+
+| Valeur hex | Mode |
+|------------|------|
+| 0x0000 | Normal |
 | 0x5678 | Boost (Clim uniquement) |
 
-### Offset 32-33 : Mode Vacances
+### Offset 24-25 : Flag mode service
+
+| Valeur hex | État |
+|------------|------|
+| 0x0000 | Mode normal |
+| 0x3412 | Mode installateur/service |
+
+### Offset 34-35 : Mode Vacances
 
 | Valeur hex | État |
 |------------|------|
 | 0x0000 | Vacances Off |
 | 0x1234 | Vacances On |
 
-### Offset 34-35 : On/Off
+### Offset 36-37 : On/Off
 
 | Valeur hex | État |
 |------------|------|
 | 0x0002 | Off |
 | 0x0003 | On |
 
-### Offset 36-37 : Type de mode
+### Offset 38-39 : Type de mode
 
 | Valeur hex | Mode |
 |------------|------|
-| 0x000C | Chauffage |
 | 0x000A | Climatisation |
+| 0x000B | Service/Installateur |
+| 0x000C | Chauffage |
 
 ---
 
 ## 4. Modes pré-configurés
 
-| Mode | Niveau (18-19) | Vacances (32-33) | On/Off (34-35) | Type (36-37) |
-|------|----------------|------------------|----------------|--------------|
-| **Chauffage Confort** | 0x0000 | 0x0000 | 0x0003 | 0x000C |
-| **Chauffage Eco** | 0x00C8 | 0x0000 | 0x0003 | 0x000C |
-| **Clim Confort** | 0x0000 | 0x0000 | 0x0003 | 0x000A |
-| **Clim Boost** | 0x5678 | 0x0000 | 0x0003 | 0x000A |
-| **Off** | 0x0000 | 0x0000 | 0x0002 | 0x000C |
-| **Vacances** | 0x0000 | 0x1234 | 0x0003 | 0x000C |
+| Mode | Niveau (18-19) | Boost (20-21) | Vacances (34-35) | On/Off (36-37) | Type (38-39) |
+|------|----------------|---------------|------------------|----------------|--------------|
+| **Chauffage Confort** | 0x0000 | 0x0000 | 0x0000 | 0x0003 | 0x000C |
+| **Chauffage Eco** | 0x00C8 | 0x0000 | 0x0000 | 0x0003 | 0x000C |
+| **Clim Confort** | 0x0000 | 0x0000 | 0x0000 | 0x0003 | 0x000A |
+| **Clim Boost** | 0x0000 | 0x5678 | 0x0000 | 0x0003 | 0x000A |
+| **Off** | 0x0000 | 0x0000 | 0x0000 | 0x0002 | 0x000C |
+| **Vacances** | 0x0000 | 0x0000 | 0x1234 | 0x0003 | 0x000C |
 
 ---
 
 ## 5. Paramètres ventilation
 
-Les offsets 28-35 peuvent aussi servir à modifier les paramètres de ventilation :
+Les offsets 26-33 servent à modifier les paramètres de ventilation (mode installateur) :
 
-### Débit nominal (offset 28-29, registre R250)
+### Débit nominal (offset 26-27, registre R250)
 
-Valeurs autorisées (m3/h) : 585, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800, 820, 840, 860, 880, 900
+Valeurs autorisées (m³/h) : 585-900 (pas de 20)
+Exemple : 0x0384 = 900, 0x0370 = 880, 0x0348 = 840
 
-### PSE débit nominal (offset 30-31, registre R247)
+### PSE débit nominal (offset 28-29, registre R247)
 
 Plage : 10 à 99 Pa (pas de 1 Pa)
+Exemple : 0x0017 = 23, 0x0018 = 24
 
-### Débit mini 1 bouche (offset 32-33, registre R249)
+### Débit mini 1 bouche (offset 30-31, registre R249)
 
-Valeurs autorisées (m3/h) : 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 315
+Valeurs autorisées (m³/h) : 90-315 (pas de 20)
+Exemple : 0x00F0 = 240, 0x00DC = 220
 
-### PSE débit mini (offset 34-35, registre R248)
+### PSE débit mini (offset 32-33, registre R248)
 
 Plage : 8 à 80 Pa (pas de 1 Pa)
+Exemple : 0x000C = 12, 0x000B = 11
 
 ---
 
@@ -131,10 +154,10 @@ Plage : 8 à 80 Pa (pas de 1 Pa)
 
 | Offset trame | Registre | Paramètre |
 |--------------|----------|-----------|
-| 28-29 | R250 (0xFA) | Débit nominal |
-| 30-31 | R247 (0xF7) | PSE débit nominal |
-| 32-33 | R249 (0xF9) | Débit mini 1 bouche |
-| 34-35 | R248 (0xF8) | PSE débit mini |
+| 26-27 | R250 (0xFA) | Débit nominal |
+| 28-29 | R247 (0xF7) | PSE débit nominal |
+| 30-31 | R249 (0xF9) | Débit mini 1 bouche |
+| 32-33 | R248 (0xF8) | PSE débit mini |
 
 ---
 
@@ -152,6 +175,13 @@ Les registres R20-R25 (consignes thermostats) sont **hardware read-only** sur le
 Les programmes horaires sont stockés localement dans la télécommande Aldes. La télécommande envoie le mode courant (Confort/Eco) quand l'heure programmée arrive.
 
 Pour gérer les horaires via domotique : utiliser les automatisations Home Assistant.
+
+### Date/heure : NON TRANSMISE
+
+La date/heure n'est **pas encodée** dans les trames 0x17 (validé par tests X19-X20).
+Chaque appareil (télécommande, PAC) maintient sa propre horloge indépendamment.
+
+Les registres R16/R17 (date/heure via USB) ne fonctionnent pas sur RBUV.
 
 ---
 
