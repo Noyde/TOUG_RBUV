@@ -76,7 +76,7 @@ sudo apt install python3-serial
 | S04 | 14-15 | 0x0E | Panel ID (32-bit) | 1 | ✅ | ✅ 1, 0 | 2025-01-10 |
 | S05 | 16 | 0x10 | Date encodée | 1 | ✅ | ❌ Non fonctionnel RBUV | 2025-01-11 |
 | S06 | 17 | 0x11 | Heure encodée | 1 | ✅ | ❌ Non fonctionnel RBUV | 2025-01-11 |
-| S07 | 51 | 0x33 | Protection compresseur | 1 | ✅ | ✅ 243 | 2025-01-10 |
+| S07 | 51 | 0x33 | R51 (inconnu) | 1 | ✅ | ✅ 243 | 2025-01-10 |
 | S08 | 90 | 0x5A | Code défaut UE | 1 | ✅ | ⚠️ 700 | 2025-01-10 |
 | S09 | 131 | 0x83 | État dégivrage | 1 | ✅ | ⚠️ 11274 | 2025-01-10 |
 

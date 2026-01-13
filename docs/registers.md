@@ -28,7 +28,7 @@ Documentation des 40 registres Modbus accessibles en lecture via USB.
 | 9 | Mode PAC | - | 1 | Voir tableau modes |
 | 14 | Panel ID (bas) | - | 1 | ID panneau 16-bit bas |
 | 15 | Panel ID (haut) | - | 1 | ID panneau 16-bit haut |
-| 51 | Protection Compresseur | - | 1 | État protection |
+| 51 | R51 (inconnu) | - | 1 | Fonction inconnue, valeur observée: 243 |
 
 > **Note R16/R17** : Les registres Date/Heure encodées (R16/R17) ne sont PAS fonctionnels sur RBUV via USB. Tests 2025-01-11 : valeurs incohérentes.
 

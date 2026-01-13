@@ -130,7 +130,7 @@ def build_registers():
         "mode": {"address": 9, "name": "Mode PAC", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:hvac"},
         "panel_id_bas": {"address": 14, "name": "Panel ID (bas)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
         "panel_id_haut": {"address": 15, "name": "Panel ID (haut)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:identifier"},
-        "protection_compresseur": {"address": 51, "name": "Protection Compresseur", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:shield"},
+        "r51_inconnu": {"address": 51, "name": "R51 (inconnu)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:help-circle"},
 
         # CONSIGNES THERMOSTATS (6 registres) - Mapping RBUV
         # R20/R21 = même thermostat (Zone 1), R22=Zone2, R23=Zone3, R24=Zone4, R25=Zone5
