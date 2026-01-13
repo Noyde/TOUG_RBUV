@@ -56,7 +56,7 @@ sudo apt install python3-serial
 | Sniff ventilation | 8 | 8 | 0 | 0 | ✅ X11-X18 |
 | Sniff date/heure | 5 | 2 | 1 | 2 | ❌ X19-X20: Date/heure non transmise |
 | Sniff consignes | 4 | 1 | 3 | 0 | ✅❌ X24-X27: pas de menu consigne |
-| Sniff analyse trame | 4 | 0 | 0 | 4 | ⬜ X28-X31 |
+| Sniff analyse trame | 4 | 4 | 0 | 0 | ✅ X28-X31 validés |
 | Envoi modes PAC | 7 | 7 | 0 | 0 | ✅ Y01-Y07 validés Pi 2B |
 | Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
 | Envoi date/heure | 2 | 0 | 0 | 2 | ❌ Y14-Y15 (date non transmise) |
@@ -416,10 +416,12 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 | ID | Test | Description | Résultat | Date |
 |----|------|-------------|----------|------|
-| X28 | Dump trame 74 bytes | Capturer et annoter tous les octets | ⬜ | |
-| X29 | Comparer trames successives | Identifier bytes qui changent | ⬜ | |
-| X30 | Valider CRC | Vérifier calcul CRC16 Modbus (octets 72-73) | ⬜ | |
-| X31 | Identifier octets inconnus | Offsets 14-17, 20-27, 38-39, 70-71 | ⬜ | |
+| X28 | Dump trame 74 bytes | Capturer et annoter tous les octets | ✅ | 2025-01-13 |
+| X29 | Comparer trames successives | Cycle séquence (2-3) + compteur (14-15) identifiés | ✅ | 2025-01-13 |
+| X30 | Valider CRC | CRC16 Modbus validé (Y01-Y07 fonctionnent) | ✅ | 2025-01-13 |
+| X31 | Identifier octets inconnus | Tous identifiés sauf 16-17 (0xF67A) | ✅ | 2025-01-13 |
+
+> ⚠️ **Conclusion X28-X31** : Structure trame 74 bytes entièrement documentée (section 3.0). Seul l'offset 16-17 reste inconnu (valeur 0xF67A observée, possiblement un ID télécommande ou checksum interne).
 
 ### 3.2 Envoi trame (ESP32 → PAC)
 
