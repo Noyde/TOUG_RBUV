@@ -23,6 +23,12 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - Consignes thermostats (R20-R25) = read-only (pilotées par radio 868MHz)
 - Registres TOUG 31100-31104 = non implémentés sur **aucun modèle** (confirmé par @djtef)
 
+### Régulation zones INDÉPENDANTE du protocole 0x17
+- Les thermostats 868MHz communiquent **directement** avec le régulateur PAC
+- Les bouches motorisées s'ouvrent/ferment **sans avoir besoin** de trames 0x17
+- Le protocole 0x17 sert **uniquement** à changer le MODE (On/Off, Chauffage/Clim, Eco/Boost, Vacances)
+- **Validé 2025-01-13** : Test sans télécommande ni trames 0x17 → bouches réagissent aux thermostats
+
 ### Mapping registres différent (RBUV sans ECS)
 | Registre | TOUG (avec ECS) | RBUV (sans ECS) |
 |----------|-----------------|-----------------|
@@ -65,12 +71,12 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 | 25 | Zone 5 |
 
 ## Statut projet
-- ✅ Lecture 40 registres via Pi Zero USB
+- ✅ Lecture 40 registres via Pi Zero USB (auto-détection port série)
 - ✅ Protocole 0x17 documenté et **validé par sniffing** (2025-01-13)
 - ✅ Tests sniffing X01-X20 complétés (modes, ventilation, date/heure)
 - ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
+- ✅ Composant ESPHome mis à jour avec offsets corrigés (2025-01-13)
 - ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
-- ⚠️ Composant ESPHome à mettre à jour avec offsets corrigés
 - ⚠️ Projet BETA - utilisation à vos risques
 
 ## Ressources
@@ -235,13 +241,14 @@ Composant C++ ESPHome implémentant le protocole propriétaire 0x17 :
 ### `tools/pac_aldes_mqtt.py`
 Script Python pour Raspberry Pi Zero. Configuration via `config.json` :
 - Lecture des 40 registres via USB (lecture seule)
+- **Auto-détection port série** : mettre `"port": "auto"` dans config.json
 - Publication MQTT avec MQTT Discovery pour Home Assistant
 - Noms de zones personnalisables via config.json
 
 ### `tools/config_example.json`
 Fichier de configuration exemple (copier en `config.json`) :
 - Credentials MQTT (broker, user, password)
-- Port série et baudrate
+- Port série : `"auto"` pour auto-détection ou chemin explicite (`/dev/ttyACM1`)
 - Noms des 6 zones (personnalisables)
 
 ### `docs/protocol.md`
@@ -380,9 +387,9 @@ Existe sur l'installation locale (Mushroom Cards, 5 onglets) mais pas encore exp
 
 - ~~Revalidation complète de tous les tests~~ ✅ Lecture complétée (2025-01-10)
 - ~~Tests protocole 0x17 sniffing~~ ✅ X01-X20 complétés (2025-01-13)
-- Tests envoi trame 0x17 (Y01-Y07) - ESP32 → PAC
-- Mise à jour composant ESPHome avec offsets corrigés
-- Tests écriture RS485 standard (W03-W04)
+- ~~Tests envoi trame 0x17 (Y01-Y07)~~ ✅ Validés via Pi 2B RS485 (2025-01-13)
+- ~~Mise à jour composant ESPHome avec offsets corrigés~~ ✅ Complété (2025-01-13)
+- Tests envoi ESP32 → PAC (validation finale sur hardware cible)
 - Tests long terme du composant ESPHome
 
 ---

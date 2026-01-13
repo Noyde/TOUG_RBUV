@@ -8,6 +8,20 @@ Documentation du protocole propriétaire utilisé pour l'écriture sur les ancie
 
 ## 1. Contexte
 
+### Rôle du protocole 0x17
+
+Le protocole 0x17 permet de contrôler **uniquement les MODES de la PAC** :
+- État On/Off
+- Type de mode (Chauffage / Climatisation / Service)
+- Niveau Eco/Confort
+- Boost (Clim uniquement)
+- Mode Vacances
+- Paramètres ventilation (débit nominal, PSE)
+
+> **IMPORTANT** : Le protocole 0x17 **NE contrôle PAS** la régulation des zones (ouverture/fermeture des bouches motorisées).
+> Les thermostats 868MHz communiquent **directement** avec le régulateur PAC, indépendamment des trames 0x17.
+> **Validé 2025-01-13** : Les bouches réagissent aux thermostats même sans télécommande et sans trames 0x17.
+
 ### Pourquoi un protocole spécial ?
 
 Les modèles T.One RBUV (2018) n'acceptent pas les fonctions Modbus standard pour l'écriture :
