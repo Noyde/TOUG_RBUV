@@ -315,10 +315,30 @@ La PAC peut accepter la commande mais ignorer le contenu.
 
 ### 3.1 Sniffing télécommande
 
-**Matériel** : Pi 2B + Waveshare RS485 en parallèle sur bus télécommande
+**Matériel** : Pi 2B + Waveshare RS485 connecté **directement** à la télécommande
+
+**Configuration** :
+- Télécommande **DÉBRANCHÉE** de la PAC
+- Waveshare RS485 connecté aux bornes A/B de la télécommande
+- Permet de capturer uniquement les trames émises (sans réponses PAC)
+
+**Connexion** :
+```
+Télécommande          Waveshare RS485 (Pi 2B)
+    A  ───────────────  A
+    B  ───────────────  B
+   GND ───────────────  GND
+```
 
 **Commande capture** :
 ```bash
+# Méthode simple
+stty -F /dev/ttyUSB0 19200 cs8 parenb -parodd -cstopb raw -echo
+timeout 30 cat /dev/ttyUSB0 > /tmp/capture.bin
+# Appuyer sur boutons télécommande pendant la capture
+xxd /tmp/capture.bin
+
+# Ou avec script (si disponible)
 python3 tests/sniff_rs485.py --output capture.bin
 ```
 
