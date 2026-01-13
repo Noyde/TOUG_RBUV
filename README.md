@@ -1,6 +1,8 @@
 # TOUG_RBUV - Intégration PAC Aldes T.One RBUV (modèles 2018)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![MQTT Discovery](https://img.shields.io/badge/MQTT-Discovery-yellow)
+![ESPHome](https://img.shields.io/badge/ESPHome-component-yellow?logo=esphome)
+![Status](https://img.shields.io/badge/status-beta-orange)
 
 ---
 
