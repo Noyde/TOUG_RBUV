@@ -112,8 +112,8 @@ TOUG_EXTENDED = {
         # 16: {"name": "Date encodée", "unit": "", "divisor": 1, "signed": False},
         # 17: {"name": "Heure encodée", "unit": "", "divisor": 1, "signed": False},
         51: {"name": "R51 (inconnu)", "unit": "", "divisor": 1, "signed": False},
-        90: {"name": "Code Défaut UE", "unit": "", "divisor": 1, "signed": False},
-        131: {"name": "État Dégivrage", "unit": "", "divisor": 1, "signed": False},
+        90: {"name": "R90 (inconnu)", "unit": "", "divisor": 1, "signed": False},
+        131: {"name": "R131 (inconnu)", "unit": "", "divisor": 1, "signed": False},
     },
 
     "toug_temperatures": {

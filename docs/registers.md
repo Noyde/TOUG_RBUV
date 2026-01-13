@@ -125,10 +125,10 @@ Documentation des 40 registres Modbus accessibles en lecture via USB.
 
 | Registre | Nom | Unité | Notes |
 |----------|-----|-------|-------|
-| 90 | Timer compresseur (?) | sec | Compteur incrémental, usage exact inconnu |
-| 131 | Timer dégivrage (?) | sec | Temps depuis dernier dégivrage (hypothèse) |
+| 90 | R90 (inconnu) | - | Valeur observée: 700, fonction inconnue |
+| 131 | R131 (inconnu) | - | Valeur observée: 11274, fonction inconnue |
 
-> **Note** : R90 et R131 sont des compteurs en secondes. Leur signification exacte reste à confirmer.
+> **Note** : R90 et R131 retournent des valeurs mais leur signification est inconnue.
 
 ---
 
