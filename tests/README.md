@@ -359,7 +359,7 @@ python3 tests/sniff_rs485.py --output capture.bin
 | X06 | Clim → Chauffage | **38-39** | 0x000C | ✅ | 2025-01-13 |
 | X07 | Clim Confort → Boost | **20-21** | 0x5678 | ✅ | 2025-01-13 |
 | X08 | Vacances On | 34-35 | 0x1234 | ✅ | 2025-01-13 |
-| X09 | Vacances Off | 34-35 | 0x0000 | ⬜ | |
+| X09 | Vacances Off | 34-35 | 0x0000 | ✅ | 2025-01-13 |
 | X10 | Cycle sous-codes | 2-3 | 01→41→81→C1 | ⬜ | |
 
 #### 3.1.2 Ventilation / Débits
