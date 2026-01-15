@@ -6,10 +6,8 @@
 namespace esphome {
 namespace aldes_tone {
 
-class AldesToneWriter : public Component {
+class AldesToneWriter : public Component, public uart::UARTDevice {
  public:
-  void set_uart(uart::UARTComponent *uart) { this->uart_ = uart; }
-
   void setup() override {
     ESP_LOGI("aldes_tone", "AldesToneWriter initialisé");
   }
@@ -33,13 +31,16 @@ class AldesToneWriter : public Component {
   bool read_vent_state() {
     uint8_t response[150];
     size_t len = 0;
+    uint8_t byte;
 
     // Attendre la réponse (timeout 200ms)
     uint32_t start = millis();
     while (millis() - start < 200 && len < sizeof(response)) {
-      if (this->uart_->available()) {
-        response[len++] = this->uart_->read();
-        start = millis();  // Reset timeout on data received
+      if (this->available()) {
+        if (this->read_byte(&byte)) {
+          response[len++] = byte;
+          start = millis();  // Reset timeout on data received
+        }
       }
     }
 
@@ -165,7 +166,7 @@ class AldesToneWriter : public Component {
     frame[73] = (crc >> 8) & 0xFF;
 
     // Envoi de la trame
-    this->uart_->write_array(frame, sizeof(frame));
+    this->write_array(frame, sizeof(frame));
     ESP_LOGI("aldes_tone", "Trame 0x17: niveau=0x%04X, boost=0x%04X, vacances=0x%04X, onoff=0x%04X, type=0x%04X",
              niveau, boost, vacances, onoff, type_mode);
   }
@@ -204,7 +205,6 @@ class AldesToneWriter : public Component {
   }
 
  protected:
-  uart::UARTComponent *uart_{nullptr};
   uint8_t vent_bitmap_{0};  // Bitmap état des bouches (byte 33 réponse 0x17)
 };
 
