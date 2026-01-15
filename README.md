@@ -124,6 +124,7 @@ Voir [esphome/README.md](esphome/README.md)
 | Mapping TOUG vs RBUV | ✅ Complété | ✅ Validé par écran PAC |
 | Tests écriture USB | ✅ Complété | ✅ 8/10 (échecs attendus) |
 | Sniffing protocole 0x17 | ✅ Complété | ✅ X01-X20 (2025-01-13) |
+| **État des bouches** | ✅ Complété | ✅ Byte 33 réponse 0x17 (2025-01-15) |
 | Envoi trames 0x17 (ESP32) | 🔄 En cours | ⚠️ Tests Y01-Y07 à faire |
 | Intégration ESPHome | 🔄 En cours | ⚠️ À revalider |
 | Écriture consignes thermostats | ❌ Impossible | ✅ Confirmé (hardware) |
