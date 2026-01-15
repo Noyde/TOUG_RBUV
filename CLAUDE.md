@@ -23,6 +23,13 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - Consignes thermostats (R20-R25) = read-only (pilotées par radio 868MHz)
 - Registres TOUG 31100-31104 = non implémentés sur **aucun modèle** (confirmé par @djtef)
 
+### État des bouches via réponse 0x17 - VALIDÉ 2025-01-15
+- R5029 (bitmap TOUG) → retourne 0 sur RBUV via USB et RS485
+- **Découverte** : Byte 33 de la réponse `01 17 80 0b` = bitmap des bouches actives !
+- K1a=0x01, K1b=0x02, K3=0x04, K4=0x08, K5=0x10, K6=0x20
+- R77 via USB donne uniquement l'index de la dernière zone (pas un bitmap)
+- **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV
+
 ### Régulation zones INDÉPENDANTE du protocole 0x17
 - Les thermostats 868MHz communiquent **directement** avec le régulateur PAC
 - Les bouches motorisées s'ouvrent/ferment **sans avoir besoin** de trames 0x17
@@ -76,6 +83,7 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - ✅ Tests sniffing X01-X20 complétés (modes, ventilation, date/heure)
 - ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
 - ✅ Composant ESPHome mis à jour avec offsets corrigés (2025-01-13)
+- ✅ **État bouches découvert** : byte 33 réponse 0x17 = bitmap (2025-01-15)
 - ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
 - ⚠️ Projet BETA - utilisation à vos risques
 
