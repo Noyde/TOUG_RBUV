@@ -14,6 +14,65 @@ class AldesToneWriter : public Component {
     ESP_LOGI("aldes_tone", "AldesToneWriter initialisé");
   }
 
+  // === ÉTAT DES BOUCHES (découverte 2025-01-15) ===
+  // Le byte 33 de la réponse 0x17 (type 01 17 80 0b) contient un bitmap des bouches actives
+  // Bit 0 = K1a (0x01), Bit 1 = K1b (0x02), Bit 2 = K3 (0x04)
+  // Bit 3 = K4 (0x08), Bit 4 = K5 (0x10), Bit 5 = K6 (0x20)
+
+  // Getters pour l'état des bouches
+  uint8_t get_vent_bitmap() { return this->vent_bitmap_; }
+  bool is_vent_k1a_active() { return (this->vent_bitmap_ & 0x01) != 0; }
+  bool is_vent_k1b_active() { return (this->vent_bitmap_ & 0x02) != 0; }
+  bool is_vent_k3_active() { return (this->vent_bitmap_ & 0x04) != 0; }
+  bool is_vent_k4_active() { return (this->vent_bitmap_ & 0x08) != 0; }
+  bool is_vent_k5_active() { return (this->vent_bitmap_ & 0x10) != 0; }
+  bool is_vent_k6_active() { return (this->vent_bitmap_ & 0x20) != 0; }
+
+  // Lire la réponse PAC et extraire l'état des bouches
+  // Appeler après send_frame() avec un délai d'environ 100ms
+  bool read_vent_state() {
+    uint8_t response[150];
+    size_t len = 0;
+
+    // Attendre la réponse (timeout 200ms)
+    uint32_t start = millis();
+    while (millis() - start < 200 && len < sizeof(response)) {
+      if (this->uart_->available()) {
+        response[len++] = this->uart_->read();
+        start = millis();  // Reset timeout on data received
+      }
+    }
+
+    if (len < 40) {
+      ESP_LOGW("aldes_tone", "Réponse trop courte: %d bytes", len);
+      return false;
+    }
+
+    // Chercher le pattern de réponse "01 17 80 0b"
+    for (size_t i = 0; i + 33 < len; i++) {
+      if (response[i] == 0x01 && response[i+1] == 0x17 &&
+          response[i+2] == 0x80 && response[i+3] == 0x0b) {
+        this->vent_bitmap_ = response[i + 33];
+        ESP_LOGI("aldes_tone", "État bouches lu: 0x%02X (K1a=%d K1b=%d K3=%d K4=%d K5=%d K6=%d)",
+                 this->vent_bitmap_,
+                 is_vent_k1a_active(), is_vent_k1b_active(), is_vent_k3_active(),
+                 is_vent_k4_active(), is_vent_k5_active(), is_vent_k6_active());
+        return true;
+      }
+    }
+
+    ESP_LOGW("aldes_tone", "Pattern réponse 01 17 80 0b non trouvé");
+    return false;
+  }
+
+  // Envoyer une trame et lire l'état des bouches en retour
+  void refresh_vent_state() {
+    // Envoyer une trame pour obtenir une réponse (mode actuel maintenu)
+    send_frame(0x0000, 0x0000, 0x0000, 0x0003, 0x000C);  // Chauffage Confort par défaut
+    delay(50);
+    read_vent_state();
+  }
+
   // Calcul CRC16 Modbus
   uint16_t crc16(const uint8_t *data, size_t len) {
     uint16_t crc = 0xFFFF;
@@ -146,6 +205,7 @@ class AldesToneWriter : public Component {
 
  protected:
   uart::UARTComponent *uart_{nullptr};
+  uint8_t vent_bitmap_{0};  // Bitmap état des bouches (byte 33 réponse 0x17)
 };
 
 }  // namespace aldes_tone

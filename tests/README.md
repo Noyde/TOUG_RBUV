@@ -60,7 +60,7 @@ sudo apt install python3-serial
 | Envoi modes PAC | 7 | 7 | 0 | 0 | ✅ Y01-Y07 validés Pi 2B |
 | Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
 | Envoi date/heure | 2 | 0 | 0 | 2 | ❌ Y14-Y15 (date non transmise) |
-| Réponses PAC | 5 | 0 | 0 | 5 | ⬜ Z01-Z05 |
+| Réponses PAC | 5 | 1 | 0 | 4 | ✅ Z01 validé (état bouches) |
 
 ---
 
@@ -470,11 +470,34 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 | ID | Test | Attendu | Résultat | Date |
 |----|------|---------|----------|------|
-| Z01 | Format réponse principale | 0117 80xx | ⬜ | |
+| Z01 | **État des bouches (bitmap)** | Byte 33 réponse `01 17 80 0b` | ✅ | 2025-01-15 |
 | Z02 | Format données additionnelles | 0117 78xx | ⬜ | |
 | Z03 | Délai réponse | < 100ms ? | ⬜ | |
 | Z04 | Contenu réponse | Quelles données ? | ⬜ | |
 | Z05 | Acquittement écriture | ACK explicite ou données ? | ⬜ | |
+
+#### Z01 - État des bouches via réponse 0x17 ✅ VALIDÉ 2025-01-15
+
+> **Découverte** : L'état des bouches (canaux actifs) est accessible via le **byte 33** de la réponse `01 17 80 0b` sur RS485 !
+
+**Bitmap byte 33** :
+
+| Bit | Zone | Valeur hex | Confirmé |
+|-----|------|------------|----------|
+| 0 | K1a | 0x01 | - |
+| 1 | K1b | 0x02 | - |
+| 2 | K3 | 0x04 | ✅ |
+| 3 | K4 | 0x08 | ✅ |
+| 4 | K5 | 0x10 | ✅ |
+| 5 | K6 | 0x20 | - |
+
+**Tests validés** :
+- K3 seule active → byte 33 = 0x04 ✓
+- K4 seule active → byte 33 = 0x08 ✓
+- K5 seule active → byte 33 = 0x10 ✓
+
+**Conclusion** : Élimine le besoin d'optocouplers pour la détection de l'état des bouches sur RBUV.
+Voir `results/sniff_Z01_etat_bouches.md` pour le rapport détaillé.
 
 ---
 
@@ -564,4 +587,4 @@ Fichier : `results/YYYY-MM-DD_ID-description.md`
 
 ---
 
-*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-13*
+*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-15*

@@ -68,11 +68,12 @@ Guide du matériel nécessaire et schémas de câblage pour l'intégration de la
 | Fils Dupont | F-F 10cm | ~2€ |
 | **Total** | | **~17€** |
 
-### Matériel optionnel (Phase 2 - détection bouches)
+### Détection état des bouches
 
-| Composant | Référence | Prix approx. |
-|-----------|-----------|--------------|
-| Optocoupler 8ch | HL-OI-VT-8-N (12V→3.3V PNP) | ~16€ |
+> ✅ **Découverte 2025-01-15** : L'état des bouches est lisible via le **byte 33** de la réponse 0x17 !
+> Les optocouplers ne sont **plus nécessaires** pour détecter l'état des bouches sur RBUV.
+>
+> Voir `docs/protocol.md` section 8 et `docs/registers.md` pour les détails.
 
 ---
 

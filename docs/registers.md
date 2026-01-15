@@ -184,6 +184,45 @@ Le modèle RBUV n'a pas d'ECS (Eau Chaude Sanitaire). Certains registres sont do
 
 ---
 
+## État des bouches (canaux actifs) - VALIDÉ 2025-01-15
+
+> ✅ **Découverte** : L'état des bouches est lisible via la réponse 0x17 sur RS485 !
+
+### R77 via USB (limité)
+
+| Registre | Bus | Description | Limitation |
+|----------|-----|-------------|------------|
+| R77 | USB 1200 | Index dernière zone active (0-5) | **Une seule zone** |
+
+Exemples R77 :
+- K3 active → R77 = 2 (zone 3 - 1)
+- K4 active → R77 = 3 (zone 4 - 1)
+- K5 active → R77 = 4 (zone 5 - 1)
+- Aucune zone → R77 = 65535 (0xFFFF)
+
+### Bitmap complet via réponse 0x17 (RS485)
+
+Pour obtenir l'état de **TOUTES** les bouches simultanément, lire le **byte 33** de la réponse `01 17 80 0b` sur RS485.
+
+| Zone | LED | Bit | Valeur hex |
+|------|-----|-----|------------|
+| K1a | 1 | 0 | 0x01 |
+| K1b | 2 | 1 | 0x02 |
+| K3 | 3 | 2 | 0x04 |
+| K4 | 4 | 3 | 0x08 |
+| K5 | 5 | 4 | 0x10 |
+| K6 | 6 | 5 | 0x20 |
+
+**Tests validés :**
+- K3 seule → byte 33 = 0x04 ✓
+- K4 seule → byte 33 = 0x08 ✓
+- K5 seule → byte 33 = 0x10 ✓
+
+> **Note** : Cette méthode élimine le besoin d'optocouplers pour la détection de l'état des bouches.
+> Voir `docs/protocol.md` section 8 pour les détails du protocole.
+
+---
+
 ## Ressources
 
 | Ressource | Lien |

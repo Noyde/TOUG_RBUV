@@ -199,7 +199,50 @@ Les registres R16/R17 (date/heure via USB) ne fonctionnent pas sur RBUV.
 
 ---
 
-## 8. Avertissements
+## 8. Structure de la réponse PAC (133 bytes) - VALIDÉ 2025-01-15
+
+La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des informations capteurs et l'état des bouches.
+
+### Types de réponse
+
+| Pattern | Type | Description |
+|---------|------|-------------|
+| `01 17 80 0b` | Réponse longue | Contient l'état des bouches (bitmap) |
+| `01 17 80 00` | Réponse courte | Données capteurs |
+| `01 17 78 xx` | Réponse secondaire | Données additionnelles |
+
+### Bitmap état des bouches (byte 33 de la réponse `01 17 80 0b`)
+
+> ✅ **Découverte 2025-01-15** : L'état des bouches est accessible via le byte 33 de la réponse 0x17 !
+
+| Bit | Zone | Valeur hex | LED |
+|-----|------|------------|-----|
+| 0 | K1a (Salon) | 0x01 | 1 |
+| 1 | K1b (Cuisine) | 0x02 | 2 |
+| 2 | K3 | 0x04 | 3 |
+| 3 | K4 | 0x08 | 4 |
+| 4 | K5 | 0x10 | 5 |
+| 5 | K6 | 0x20 | 6 |
+
+**Exemples :**
+- K3 seule active → byte 33 = 0x04
+- K4 seule active → byte 33 = 0x08
+- K5 seule active → byte 33 = 0x10
+- K3 + K4 actives → byte 33 = 0x0C (0x04 | 0x08)
+
+### Comparaison avec registre R77 (USB)
+
+| Méthode | Bus | Type | Limitation |
+|---------|-----|------|------------|
+| R77 via USB | USB 1200 | Index zone (0-5) | Dernière zone uniquement |
+| Byte 33 réponse 0x17 | RS485 19200 | Bitmap | **Toutes les zones** ✓ |
+
+> **Conclusion** : Pour connaître l'état de TOUTES les bouches simultanément, utiliser la réponse 0x17 sur RS485.
+> Ceci élimine le besoin d'optocouplers pour la détection de l'état des bouches sur RBUV.
+
+---
+
+## 9. Avertissements
 
 **Utilisation à vos risques**
 
@@ -217,7 +260,7 @@ L'ESP32 et la télécommande Aldes ne peuvent pas coexister sur le même bus RS4
 
 ---
 
-## 9. Ressources
+## 10. Ressources
 
 | Ressource | Lien |
 |-----------|------|
