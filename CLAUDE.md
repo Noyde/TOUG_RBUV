@@ -25,10 +25,10 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 
 ### État des bouches via réponse 0x17 - VALIDÉ 2025-01-15
 - R5029 (bitmap TOUG) → retourne 0 sur RBUV via USB et RS485
+- R77 via USB → fonction inconnue, **non corrélé** aux bouches actives
 - **Découverte** : Byte 33 de la réponse `01 17 80 0b` = bitmap des bouches actives !
 - K1a=0x01, K1b=0x02, K3=0x04, K4=0x08, K5=0x10, K6=0x20
-- R77 via USB donne uniquement l'index de la dernière zone (pas un bitmap)
-- **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV
+- **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV (via RS485 protocole 0x17)
 
 ### Régulation zones INDÉPENDANTE du protocole 0x17
 - Les thermostats 868MHz communiquent **directement** avec le régulateur PAC

@@ -480,7 +480,12 @@ python3 tests/sniff_rs485.py --output capture.bin
 
 > **Découverte** : L'état des bouches (canaux actifs) est accessible via le **byte 33** de la réponse `01 17 80 0b` sur RS485 !
 
-**Bitmap byte 33** :
+**R77 via USB** : ❌ **INVALIDÉ** - fonction inconnue, non corrélé aux bouches actives
+- K1a + K1b actives → R77 = 3
+- K1a + K1b + K3 + K4 actives → R77 = 0 (devrait être 15 si bitmap)
+- Aucune bouche → R77 = 65535 (0xFFFF)
+
+**Bitmap byte 33 réponse 0x17 (RS485)** : ✅ VALIDÉ
 
 | Bit | Zone | Valeur hex | Confirmé |
 |-----|------|------------|----------|
@@ -496,7 +501,7 @@ python3 tests/sniff_rs485.py --output capture.bin
 - K4 seule active → byte 33 = 0x08 ✓
 - K5 seule active → byte 33 = 0x10 ✓
 
-**Conclusion** : Élimine le besoin d'optocouplers pour la détection de l'état des bouches sur RBUV.
+**Conclusion** : Seule la réponse 0x17 sur RS485 donne le bitmap fiable. R77 USB ne fonctionne pas.
 Voir `results/sniff_Z01_etat_bouches.md` pour le rapport détaillé.
 
 ---

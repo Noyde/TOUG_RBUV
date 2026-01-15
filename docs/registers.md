@@ -188,19 +188,20 @@ Le modèle RBUV n'a pas d'ECS (Eau Chaude Sanitaire). Certains registres sont do
 
 > ✅ **Découverte** : L'état des bouches est lisible via la réponse 0x17 sur RS485 !
 
-### R77 via USB (limité)
+### R77 via USB (non fiable)
 
 | Registre | Bus | Description | Limitation |
 |----------|-----|-------------|------------|
-| R77 | USB 1200 | Index dernière zone active (0-5) | **Une seule zone** |
+| R77 | USB 1200 | Fonction inconnue | ❌ **Non corrélé** aux bouches actives |
 
-Exemples R77 :
-- K3 active → R77 = 2 (zone 3 - 1)
-- K4 active → R77 = 3 (zone 4 - 1)
-- K5 active → R77 = 4 (zone 5 - 1)
-- Aucune zone → R77 = 65535 (0xFFFF)
+Tests R77 (2025-01-15) :
+- K1a + K1b actives → R77 = 3
+- K1a + K1b + K3 + K4 actives → R77 = 0
+- Aucune bouche → R77 = 65535 (0xFFFF)
 
-### Bitmap complet via réponse 0x17 (RS485)
+> ⚠️ R77 n'est **PAS** un bitmap des bouches. Fonction inconnue.
+
+### Bitmap complet via réponse 0x17 (RS485) ✅
 
 Pour obtenir l'état de **TOUTES** les bouches simultanément, lire le **byte 33** de la réponse `01 17 80 0b` sur RS485.
 
