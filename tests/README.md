@@ -61,6 +61,8 @@ sudo apt install python3-serial
 | Envoi ventilation | 6 | 0 | 0 | 6 | ⬜ Y08-Y13 |
 | Envoi date/heure | 2 | 0 | 0 | 2 | ❌ Y14-Y15 (date non transmise) |
 | Réponses PAC | 5 | 1 | 0 | 4 | ✅ Z01 validé (état bouches) |
+| **USB Box Connect** | | | | | |
+| Protocole 115200 (djtef) | 6 | 0 | 0 | 6 | ⬜ BC01-BC06 à tester |
 
 ---
 
@@ -501,7 +503,87 @@ Voir `results/sniff_Z01_etat_bouches.md` pour le rapport détaillé.
 
 ---
 
-## 4. Commandes de test
+## 4. Protocole USB Box Connect (Nouveau - 2025-01-16)
+
+> **Source** : Découverte @djtef via sniffing USB d'une passerelle Box Connect Aldes
+> **Statut** : Non testé sur RBUV - À valider
+
+### 4.0 Contexte
+
+@djtef a analysé le trafic USB entre une PAC T.One et une passerelle Box Connect Aldes. Il a découvert un **protocole propriétaire différent** du Modbus standard utilisé actuellement à 1200 bauds.
+
+**Hypothèse architecture** : Bus interne unique avec plusieurs façades (USB, télécommande 0x17, Modbus standard).
+
+### 4.1 Paramètres protocole Box Connect
+
+| Paramètre | Modbus actuel | Box Connect |
+|-----------|---------------|-------------|
+| Baudrate | 1200 | **115200** |
+| Parité | EVEN | **Aucune** |
+| Keep-alive | Non requis | **Ping/Pong** |
+| Écriture | ❌ Impossible | ✅ Type 0x58 |
+
+### 4.2 Structure trames
+
+| Header | Direction | Description |
+|--------|-----------|-------------|
+| `FA FD` | PAC → Passerelle | Message sortant (Ping) |
+| `FD FA` | Passerelle → PAC | Commandes/Requêtes |
+| `FF FD` | PAC → Passerelle | Réponse directe |
+
+### 4.3 Tests à effectuer
+
+> **Script** : `tools/test_usb_boxconnect.py`
+> **Prérequis** : `sudo systemctl stop pac_aldes`
+
+| ID | Test | Description | Attendu | Résultat | Date |
+|----|------|-------------|---------|----------|------|
+| BC01 | Écoute passive 115200 | Capture trames spontanées | Trames FA FD (Ping) | ⬜ | |
+| BC02 | Envoi Pong | `FD FA 07 FF 13 FE F2` | Réponse PAC | ⬜ | |
+| BC03 | Initialisation mode standard | `02 03 04 20 00 01 02 42 A2` | Réponse 112 octets | ⬜ | |
+| BC04 | Requête config (0x21) | `FD FA 08 FF 41 21 FE A2` | Réponse 64 octets | ⬜ | |
+| BC05 | Modbus encapsulé | `02 03 04 20 00 01 84 C3` | Réponse valide | ⬜ | |
+| BC06 | Retour 1200 bauds | Modbus standard FC03 | R1 = 3019 | ⬜ | |
+
+### 4.4 Trames de référence
+
+```
+# Ping (envoyé par PAC toutes les 2-20s)
+FA FD 07 FF 4A FE BB
+
+# Pong (réponse passerelle)
+FD FA 07 FF 13 FE F2
+
+# Initialisation (switch Debug → Standard)
+02 03 04 20 00 01 02 42 A2
+
+# Requête config (Type 0x21)
+FD FA 08 FF 41 21 FE A2
+
+# Requête Modbus encapsulée
+02 03 04 20 00 01 84 C3
+```
+
+### 4.5 Types de rapports
+
+| Type ID | Longueur | Contenu |
+|---------|----------|---------|
+| 0x21 | 64 oct | Configuration (consignes, modes) |
+| 0x22 | 112 oct | Monitoring (températures, vitesses) |
+| 0x23 | 119 oct | Programmation horaire (7j/24h bitmap) |
+| 0x25 | 175 oct | Full Debug (mode par défaut) |
+
+### 4.6 Questions ouvertes
+
+1. **Le RBUV 2018 supporte-t-il ce protocole ?** (Firmware 3019)
+2. **L'écriture via 0x58 fonctionne-t-elle ?** (Consignes thermostats ?)
+3. **Coexistence avec Modbus 1200 bauds ?** (Ou exclusif ?)
+
+> **Documentation complète** : `docs/usb-protocol-boxconnect.md`
+
+---
+
+## 5. Commandes de test
 
 ### Scripts automatisés
 
@@ -587,4 +669,4 @@ Fichier : `results/YYYY-MM-DD_ID-description.md`
 
 ---
 
-*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-15*
+*Documentation TOUG_RBUV - Tests - Mise à jour 2025-01-16*

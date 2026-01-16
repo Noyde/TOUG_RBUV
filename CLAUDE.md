@@ -13,11 +13,32 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - Seule la fonction 0x17 (Read/Write Multiple) fonctionne pour l'écriture
 - Trames de 74 bytes comme la télécommande Aldes
 
-### Deux bus
+### Deux bus (confirmés)
 | Bus | Baudrate | Lecture | Écriture |
 |-----|----------|---------|----------|
-| USB | 1200 | ✅ | ❌ |
+| USB | 1200 | ✅ Modbus 0x03 | ❌ |
 | RS485 télécommande | 19200 | ✅ | ✅ (0x17) |
+
+### Protocole USB Box Connect - DÉCOUVERT 2025-01-16 (djtef)
+> ⚠️ **Non testé sur RBUV** - À valider via `tools/test_usb_boxconnect.py`
+
+Protocole propriétaire utilisé par la passerelle Box Connect Aldes (sniffing USB par @djtef) :
+- **Baudrate** : 115200 (vs 1200 actuel)
+- **Parité** : Aucune (vs EVEN actuel)
+- **Keep-alive** : Ping/Pong obligatoire
+- **Écriture possible** via type 0x58 !
+
+| Header | Direction | Description |
+|--------|-----------|-------------|
+| `FA FD` | PAC → Passerelle | Message sortant (Ping) |
+| `FD FA` | Passerelle → PAC | Commandes/Requêtes |
+| `FF FD` | PAC → Passerelle | Réponse directe |
+
+Types de rapports : 0x21 (config, 64 oct), 0x22 (monitoring, 112 oct), 0x23 (prog, 119 oct), 0x25 (debug, 175 oct)
+
+**Hypothèse** : Bus interne unique avec plusieurs façades (USB, télécommande, Modbus).
+
+Voir : `docs/usb-protocol-boxconnect.md`
 
 ### Limitations hardware confirmées
 - Consignes thermostats (R20-R25) = read-only (pilotées par radio 868MHz)
@@ -84,6 +105,7 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
 - ✅ Composant ESPHome mis à jour avec offsets corrigés (2025-01-13)
 - ✅ **État bouches découvert** : byte 33 réponse 0x17 = bitmap (2025-01-15)
+- ⬜ **Protocole USB Box Connect** : Découvert par @djtef (2025-01-16) - tests à faire !
 - ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
 - ⚠️ Projet BETA - utilisation à vos risques
 
@@ -106,7 +128,8 @@ TOUG_RBUV/
 │   ├── hardware.md              # Schémas de câblage matériel
 │   ├── pi-zero-setup.md         # Guide installation Raspberry Pi
 │   ├── protocol.md              # Documentation protocole 0x17
-│   └── registers.md             # Mapping des 40 registres Modbus
+│   ├── registers.md             # Mapping des 40 registres Modbus
+│   └── usb-protocol-boxconnect.md # Protocole USB Box Connect (djtef)
 ├── esphome/                     # Configuration ESPHome
 │   ├── README.md                # Guide ESPHome
 │   ├── aldes-tone-rbuv.yaml     # Configuration principale YAML
@@ -121,7 +144,8 @@ TOUG_RBUV/
 └── tools/                       # Scripts et services
     ├── pac_aldes_mqtt.py         # Script Python Modbus→MQTT
     ├── config_example.json        # Config exemple (copier en config.json)
-    └── pac_aldes.service          # Service systemd
+    ├── pac_aldes.service          # Service systemd
+    └── test_usb_boxconnect.py     # Test protocole USB 115200 (djtef)
 ```
 
 ---
@@ -204,6 +228,21 @@ TOUG_RBUV/
 | Y07 | Retour normal | 34-35 | 0x0000 | 4 | ✅ |
 
 > **Note** : Eco/Boost non distinguables via R9 (pas de registre Modbus dédié). Script: `tools/test_send_0x17.py`
+
+### Tests protocole USB Box Connect ⬜ À FAIRE (2025-01-16)
+
+Script : `tools/test_usb_boxconnect.py`
+
+| Test | Description | Attendu | Statut |
+|------|-------------|---------|--------|
+| T01 | Écoute passive 115200 bauds | Trames FA FD (Ping) | ⬜ |
+| T02 | Envoi Pong | Réponse PAC | ⬜ |
+| T03 | Trame initialisation | Switch mode standard (112 oct) | ⬜ |
+| T04 | Requête config (0x21) | Réponse 64 octets | ⬜ |
+| T05 | Modbus encapsulé | Réponse valide | ⬜ |
+| T06 | Comparaison 1200 bauds | Modbus standard fonctionne | ⬜ |
+
+> **Objectif** : Déterminer si le RBUV 2018 supporte le protocole Box Connect en plus du Modbus standard
 
 ### Commandes de test
 
@@ -399,6 +438,7 @@ Existe sur l'installation locale (Mushroom Cards, 5 onglets) mais pas encore exp
 - ~~Mise à jour composant ESPHome avec offsets corrigés~~ ✅ Complété (2025-01-13)
 - Tests envoi ESP32 → PAC (validation finale sur hardware cible)
 - Tests long terme du composant ESPHome
+- **Tests protocole USB Box Connect** (115200 bauds) - script prêt : `tools/test_usb_boxconnect.py`
 
 ---
 
