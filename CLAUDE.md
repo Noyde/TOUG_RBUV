@@ -30,6 +30,13 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - R77 via USB donne uniquement l'index de la dernière zone (pas un bitmap)
 - **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV
 
+### IDs thermostats 868MHz dans réponse 0x17 - DÉCOUVERT 2025-01-18
+- Offsets 85-108 de la réponse `01 17 80 0b` contiennent les 6 IDs thermostats
+- Format : 4 bytes par ID, encodage **little-endian**
+- Exemple : `e7 87 00 f3` → ID 00F3E787
+- TH1 et TH2 partagent le même ID (K1a et K1b sur même thermostat physique)
+- ⚠️ Structure complète réponse à valider par capture synchronisée
+
 ### Régulation zones INDÉPENDANTE du protocole 0x17
 - Les thermostats 868MHz communiquent **directement** avec le régulateur PAC
 - Les bouches motorisées s'ouvrent/ferment **sans avoir besoin** de trames 0x17
