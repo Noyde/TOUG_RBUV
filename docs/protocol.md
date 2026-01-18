@@ -94,12 +94,16 @@ L'écriture via protocole 0x17 ne fonctionne que sur le **bus télécommande** (
 | 0x0000 | Normal |
 | 0x5678 | Boost (Clim uniquement) |
 
-### Offset 24-25 : Flag mode service
+### Offset 24-25 : Flag mode service - CONFIRMÉ 2025-01-18
+
+> ✅ **Confirmé** via capture sniff_X11.bin (test modification débit nominal)
 
 | Valeur hex | État |
 |------------|------|
 | 0x0000 | Mode normal |
-| 0x3412 | Mode installateur/service |
+| **0x3412** | **Mode installateur/service** |
+
+**Note** : Ce flag est envoyé **conjointement** avec le type mode 0x000B (offset 38-39) lors de modifications des paramètres de ventilation via le menu installateur de la télécommande.
 
 ### Offset 34-35 : Mode Vacances
 
