@@ -205,13 +205,41 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 
 ### Types de réponse
 
-| Pattern | Type | Description |
-|---------|------|-------------|
-| `01 17 80 0b` | Réponse longue | Contient l'état des bouches (bitmap) |
-| `01 17 80 00` | Réponse courte | Données capteurs |
-| `01 17 78 xx` | Réponse secondaire | Données additionnelles |
+| Pattern | Type | Taille | Description |
+|---------|------|--------|-------------|
+| `01 17 80 0b` | Réponse principale | ~133 bytes | Contient état bouches, thermostats, températures |
+| `01 17 80 00` | Réponse courte | ~129 bytes | Données capteurs |
+| `01 17 78 xx` | Réponse secondaire | ~105 bytes | Données additionnelles |
 
-### Bitmap état des bouches (byte 33 de la réponse `01 17 80 0b`)
+### Structure détaillée réponse `01 17 80 0b` (133 bytes)
+
+> ⚠️ **À VALIDER** : Structure découverte par analyse, certains offsets nécessitent confirmation par capture synchronisée.
+
+| Offset | Taille | Description | Valeurs | Statut |
+|--------|--------|-------------|---------|--------|
+| 0 | 1 | Adresse Modbus | 0x01 | ✅ Confirmé |
+| 1 | 1 | Fonction | 0x17 | ✅ Confirmé |
+| 2 | 1 | Type réponse | 0x80 | ✅ Confirmé |
+| 3 | 1 | Sous-type | 0x0B | ✅ Confirmé |
+| 4 | 1 | ? | Variable | ❓ À identifier |
+| 5-6 | 2 | Débit mesuré ? | m³/h | ⚠️ À valider |
+| 7-8 | 2 | PSE mesurée ? | Pa | ⚠️ À valider |
+| 9-12 | 4 | ? | Variable | ❓ À identifier |
+| 13-14 | 2 | Compteur trame | Incrémente | ⚠️ À valider |
+| 15-19 | 5 | ? | Variable | ❓ À identifier |
+| **20** | 1 | **Mode PAC** | 02=Clim, 04=Chauff, 05=Off | ✅ Confirmé |
+| 21-32 | 12 | ? | Variable | ❓ À identifier |
+| **33** | 1 | **Bitmap bouches** | Voir tableau ci-dessous | ✅ **Confirmé** |
+| 34-38 | 5 | ? | Variable | ❓ À identifier |
+| **39-50** | 12 | **Consignes zones** | 6×2 bytes, ÷100 pour °C | ⚠️ À valider |
+| 51-68 | 18 | ? | Variable | ❓ À identifier |
+| **69-80** | 12 | **T° zones mesurées** | 6×2 bytes, ÷100 pour °C | ⚠️ À valider |
+| 81-84 | 4 | ? | Variable | ❓ À identifier |
+| **85-108** | 24 | **IDs thermostats 868MHz** | 6×4 bytes, little-endian | ✅ **Confirmé** |
+| 109-130 | 22 | ? | Variable | ❓ À identifier |
+| 131-132 | 2 | CRC16 Modbus | Calculé | ✅ Confirmé |
+
+### Bitmap état des bouches (byte 33)
 
 > ✅ **Découverte 2025-01-15** : L'état des bouches est accessible via le byte 33 de la réponse 0x17 !
 
@@ -224,11 +252,27 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 | 4 | K5 | 0x10 | 5 |
 | 5 | K6 | 0x20 | 6 |
 
-**Exemples :**
-- K3 seule active → byte 33 = 0x04
-- K4 seule active → byte 33 = 0x08
-- K5 seule active → byte 33 = 0x10
+**Exemples validés :**
+- K4 seule active → byte 33 = 0x08 ✅
+- K5 seule active → byte 33 = 0x10 ✅
 - K3 + K4 actives → byte 33 = 0x0C (0x04 | 0x08)
+
+### IDs thermostats 868MHz (offsets 85-108)
+
+> ✅ **Découverte 2025-01-18** : Les IDs des thermostats radio sont transmis dans la réponse !
+
+Format : 6 IDs de 4 bytes chacun, encodés en **little-endian**.
+
+| Offset | Zone | Exemple hex | ID décimal |
+|--------|------|-------------|------------|
+| 85-88 | TH1 (K1a) | `e7 87 00 f3` | 00F3E787 |
+| 89-92 | TH2 (K1b) | `e7 87 00 f3` | 00F3E787 |
+| 93-96 | TH3 (K3) | `03 e2 00 f3` | 00F3E203 |
+| 97-100 | TH4 (K4) | `e3 e1 00 f3` | 00F3E1E3 |
+| 101-104 | TH5 (K5) | `fe e1 00 f3` | 00F3E1FE |
+| 105-108 | TH6 (K6) | `e0 e1 00 f3` | 00F3E1E0 |
+
+> **Note** : TH1 et TH2 partagent le même ID car K1a et K1b sont sur le même thermostat physique.
 
 ### Comparaison avec registre R77 (USB)
 
@@ -239,6 +283,23 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 
 > **Conclusion** : Pour connaître l'état de TOUTES les bouches simultanément, utiliser la réponse 0x17 sur RS485.
 > Ceci élimine le besoin d'optocouplers pour la détection de l'état des bouches sur RBUV.
+
+### Données écran PAC (référence pour validation)
+
+Valeurs observées sur écran TEST PAC et REGLAGE DEBIT/PRESSION UI :
+
+| Paramètre | Valeur | Hex attendu | Registre Modbus |
+|-----------|--------|-------------|-----------------|
+| Nb. heures comp. ON | 12400 H | 0x3070 | R66 |
+| Tsortie Comp. | 61,7 °C | 0x1829 (÷100) | R117 |
+| Tair exterieur | 2,0 °C | 0x00C8 (÷100) | R112 |
+| Tair repris UI | 6,2 °C | 0x026C (÷100) | ? |
+| EEV1 | 110 Pls | 0x006E | R64 |
+| Nb. canaux ON | 3 | 0x03 | ? |
+| Debit aux bouches | 301 m³/h | 0x012D | R251 |
+| P. statique externe | 13 Pa | 0x000D | R247 |
+
+> Ces valeurs serviront de référence pour valider les offsets lors d'une capture synchronisée.
 
 ---
 
