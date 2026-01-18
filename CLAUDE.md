@@ -31,11 +31,16 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV
 
 ### IDs thermostats 868MHz dans réponse 0x17 - DÉCOUVERT 2025-01-18
-- Offsets 85-108 de la réponse `01 17 80 0b` contiennent les 6 IDs thermostats
+- Offsets 88-111 de la réponse `01 17 80 0b` contiennent les 6 IDs thermostats
 - Format : 4 bytes par ID, encodage **little-endian**
 - Exemple : `e7 87 00 f3` → ID 00F3E787
 - TH1 et TH2 partagent le même ID (K1a et K1b sur même thermostat physique)
-- ⚠️ Structure complète réponse à valider par capture synchronisée
+
+### Températures zones dans réponse 0x17 - VALIDÉ 2025-01-18
+- Offsets 72-83 de la réponse `01 17 80 0b` = températures mesurées (6×2 bytes)
+- Équivalent aux registres R36-R41 via USB
+- Format : little-endian, ÷100 pour °C
+- Validation : Z4 = 20.75°C identique sur trame 0x17 et R40 USB
 
 ### Régulation zones INDÉPENDANTE du protocole 0x17
 - Les thermostats 868MHz communiquent **directement** avec le régulateur PAC
