@@ -305,6 +305,42 @@ Valeurs observées sur écran TEST PAC et REGLAGE DEBIT/PRESSION UI :
 
 > Ces valeurs serviront de référence pour valider les offsets lors d'une capture synchronisée.
 
+### Méthodologie de mapping des bytes inconnus
+
+Pour identifier les bytes inconnus de la réponse, suivre cette procédure :
+
+1. **Capture synchronisée** : Capturer les trames RS485 pendant que l'écran PAC affiche des valeurs connues
+2. **Varier un seul paramètre** : Changer une seule condition (ex: allumer/éteindre une zone)
+3. **Comparer les trames** : Identifier les bytes qui changent entre les captures
+4. **Corrélation** : Vérifier si les valeurs correspondent aux données écran (÷100 pour °C, ÷10 pour Hz)
+
+### Bytes à investiguer en priorité
+
+| Offset | Hypothèse | Test suggéré |
+|--------|-----------|--------------|
+| 5-6 | Débit mesuré | Comparer avec R251 |
+| 7-8 | PSE mesurée | Comparer avec R247 |
+| 13-14 | Compteur trame | Vérifier incrémentation |
+| 34-38 | État compresseur ? | Comparer On/Off compresseur |
+| 51-68 | T° supplémentaires ? | Comparer avec R104-R117 |
+| 81-84 | Fréquences ? | Comparer avec R60-R63 |
+
+### Exemple d'analyse capture_zones.bin
+
+Extrait typique d'une réponse `80 0b` (hexdump) :
+
+```
+0117 800b cb00 0000 0000 0000 0000 0000  # Header + données début
+0000 0000 0400 0000 0000 0000 0000 0808  # Mode=04 (chauffage), bitmap=08 (K4)
+1508 0a08 1508 1508 1508 1508 0000 0000  # Consignes zones?
+...
+e787 00f3 e787 00f3 e203 00f3 e1e3 00f3  # IDs thermostats TH1-TH4
+e1fe 00f3 e1e0 00f3 0000 0000 0000 0000  # IDs TH5-TH6 + padding
+xxxx                                      # CRC16
+```
+
+> **Note** : Les valeurs réelles varient selon l'état de la PAC au moment de la capture.
+
 ---
 
 ## 9. Avertissements
