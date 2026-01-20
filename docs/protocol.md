@@ -211,9 +211,9 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 
 | Pattern | Type | Taille | Description |
 |---------|------|--------|-------------|
-| `01 17 80 0b` | Réponse principale | ~133 bytes | Contient état bouches, thermostats, températures |
+| `01 17 80 0b` | Réponse principale | ~133 bytes | Contient état bouches, thermostats, températures zones |
 | `01 17 80 00` | Réponse courte | ~129 bytes | Données capteurs |
-| `01 17 78 xx` | Réponse secondaire | ~105 bytes | Données additionnelles |
+| `01 17 78 xx` | Réponse ventilation | ~128 bytes | **Paramètres ventilation (R247-R251)** ✅ VALIDÉ |
 
 ### Structure détaillée réponse `01 17 80 0b` (133 bytes)
 
@@ -304,6 +304,45 @@ Capture RS485 et lecture Modbus USB effectuées simultanément. **Correspondance
 | Z5 | 84-85 | **20.00°C** | **2000** | ✅ |
 
 > **Conclusion** : Structure de la réponse `01 17 80 0b` entièrement validée par capture synchronisée !
+
+### Structure réponse `01 17 78 xx` (Ventilation) - VALIDÉ 2025-01-20
+
+> ✅ **Découverte 2025-01-20** : Les paramètres de ventilation (R247-R251) sont dans la réponse `78 xx`, pas `80 0b` !
+
+La réponse `78 xx` contient les données de ventilation et compresseur. Taille ~128 bytes.
+
+#### Paramètres ventilation (offsets ~107-118)
+
+| Offset | Taille | Description | Registre | Format | Statut |
+|--------|--------|-------------|----------|--------|--------|
+| ~107-108 | 2 | ? | ? | big-endian | ❓ |
+| **~109-110** | 2 | **PSE Nominal** | **R247** | big-endian | ✅ **VALIDÉ** |
+| **~111-112** | 2 | **PSE Mini** | **R248** | big-endian | ✅ **VALIDÉ** |
+| **~113** | 1 | **Débit 1 Bouche** | **R249** | 8-bit | ✅ **VALIDÉ** |
+| **~114-115** | 2 | **Débit Nominal** | **R250** | big-endian | ✅ **VALIDÉ** |
+| **~116-117** | 2 | **PSE Mesurée** | **R251** | big-endian | ✅ **VALIDÉ** |
+
+#### Validation capture synchronisée (2025-01-20)
+
+| Paramètre | Dashboard | R USB | Capture hex | Match |
+|-----------|-----------|-------|-------------|-------|
+| PSE Nominal | 23 Pa | R247=23 | 0x0017 | ✅ |
+| PSE Mini | 12 Pa | R248=12 | 0x000C | ✅ |
+| Débit 1 Bouche | 240 m³/h | R249=240 | 0xF0 | ✅ |
+| Débit Nominal | 900 m³/h | R250=900 | 0x0384 | ✅ |
+| PSE Mesurée | 15 Pa | R251=15 | 0x000F | ✅ |
+
+#### Bytes à investiguer dans `78 xx`
+
+| Registre | Valeur dashboard | Hex attendu | Description |
+|----------|------------------|-------------|-------------|
+| R60 | 31 Hz (×10=310) | 0x0136 | Fréquence compresseur |
+| R62 | 2.43 A (×100=243) | 0x00F3 | Courant compresseur |
+| R63 | 486 rpm (×10=4860) | 0x12FC | Vitesse ventilation |
+| R64 | 189 Pls | 0x00BD | Position EEV1 |
+| R117 | 50.9°C (×100=5090) | 0x13E2 | T° sortie compresseur |
+
+> **Note** : Les offsets exacts dans `78 xx` nécessitent une capture supplémentaire pour validation complète.
 
 ### Comparaison avec registre R77 (USB)
 
