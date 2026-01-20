@@ -211,7 +211,7 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 
 | Pattern | Type | Taille | Description |
 |---------|------|--------|-------------|
-| `01 17 80 0b` | Réponse principale | ~133 bytes | Zones, thermostats, R61-R64 ✅ |
+| `01 17 80 0b` | Réponse principale | ~133 bytes | Zones, thermostats, **R60-R64** ✅ |
 | `01 17 80 01` | Réponse compresseur | ~130 bytes | **R65 Consigne fréq, R117 T° sortie** ✅ VALIDÉ |
 | `01 17 80 00` | Réponse courte | ~129 bytes | Données capteurs |
 | `01 17 78 xx` | Réponse ventilation | ~128 bytes | **R247-R251 Débits/PSE** ✅ VALIDÉ |
@@ -239,12 +239,12 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 | **74-85** | 12 | **T° zones mesurées (R36-R41)** | 6×2 bytes, big-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
 | 86-88 | 3 | ? | Variable | ❓ À identifier |
 | **89-112** | 24 | **IDs thermostats 868MHz** | 6×4 bytes, little-endian | ✅ **Confirmé** |
-| **113-114** | 2 | **R61 Vitesse ventilation** | big-endian, rpm | ✅ **VALIDÉ 2025-01-20** |
-| 115-116 | 2 | R61 (duplicate) | big-endian | ✅ Confirmé |
-| **117-118** | 2 | **R62** | big-endian | ✅ **VALIDÉ 2025-01-20** |
-| **119-120** | 2 | **R63** | big-endian | ✅ **VALIDÉ 2025-01-20** |
-| **121-122** | 2 | **R64** | big-endian | ✅ **VALIDÉ 2025-01-20** |
-| 123-130 | 8 | ? | Variable | ❓ À identifier |
+| 113-120 | 8 | Padding | 0xFFFFFFFFFFFFFFFF | ✅ Confirmé |
+| **121-122** | 2 | **R60 Fréquence compresseur** | big-endian, ÷10 Hz | ✅ **VALIDÉ 2025-01-20** |
+| **123-124** | 2 | **R61 Vitesse ventilation** | big-endian, rpm | ✅ **VALIDÉ 2025-01-20** |
+| **125-126** | 2 | **R62** | big-endian | ✅ **VALIDÉ 2025-01-20** |
+| **127-128** | 2 | **R63** | big-endian | ✅ **VALIDÉ 2025-01-20** |
+| **129-130** | 2 | **R64** | big-endian | ✅ **VALIDÉ 2025-01-20** |
 | 131-132 | 2 | CRC16 Modbus | Calculé | ✅ Confirmé |
 
 ### Bitmap état des bouches (byte 33)
@@ -360,10 +360,11 @@ La réponse `78 xx` contient les données de ventilation et compresseur. Taille 
 
 | Registre | Description | Réponse | Offset | Statut |
 |----------|-------------|---------|--------|--------|
-| R61 | Vitesse ventilation | `80 0b` | 113-114 | ✅ VALIDÉ |
-| R62 | ? | `80 0b` | 5-6, 117-118 | ✅ VALIDÉ |
-| R63 | ? | `80 0b` | 7-8, 119-120 | ✅ VALIDÉ |
-| R64 | ? | `80 0b` | 121-122 | ✅ VALIDÉ |
+| **R60** | **Fréquence compresseur** | `80 0b` | 121-122 | ✅ **VALIDÉ** |
+| R61 | Vitesse ventilation | `80 0b` | 123-124 | ✅ VALIDÉ |
+| R62 | ? | `80 0b` | 5-6, 125-126 | ✅ VALIDÉ |
+| R63 | ? | `80 0b` | 7-8, 127-128 | ✅ VALIDÉ |
+| R64 | ? | `80 0b` | 129-130 | ✅ VALIDÉ |
 | R65 | Consigne fréquence | `80 01` | 4-5 | ✅ VALIDÉ |
 | R117 | T° sortie compresseur | `80 01` | ~105-106 | ✅ VALIDÉ |
 | R247 | PSE Nominal | `78 xx` | ~109-110 | ✅ VALIDÉ |
@@ -372,7 +373,7 @@ La réponse `78 xx` contient les données de ventilation et compresseur. Taille 
 | R250 | Débit Nominal | `78 xx` | ~114-115 | ✅ VALIDÉ |
 | R251 | PSE Mesurée | `78 xx` | ~116-117 | ✅ VALIDÉ |
 
-> **Note** : R60 (Fréquence compresseur mesurée) reste à localiser.
+> **Note** : Tous les registres compresseur/ventilation (R60-R65, R117, R247-R251) sont maintenant localisés !
 
 ### Comparaison avec registre R77 (USB)
 
