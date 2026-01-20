@@ -471,7 +471,73 @@ xxxx                                      # CRC16
 
 ---
 
-## 9. Avertissements
+## 9. Trame `21 xx` - Communication interne PAC - DÉCOUVERTE 2025-01-20
+
+> ⚠️ **DÉCOUVERTE** : Une trame différente de `01 17` a été identifiée sur le bus RS485 !
+
+Cette trame semble être une communication interne de la PAC (pas initiée par la télécommande). Elle contient des données **non disponibles** dans les réponses `01 17` standard, notamment :
+- **Courant compresseur** (introuvable via USB et 01 17)
+- **Heures compresseur et ventilateur**
+- **Températures internes**
+
+### Caractéristiques
+
+| Propriété | Valeur |
+|-----------|--------|
+| Pattern | `21 xx ...` (pas `01 17`) |
+| Bus | RS485 télécommande (19200 bauds) |
+| Périodicité | Communication interne périodique |
+
+### Structure identifiée (partielle)
+
+> ✅ **Valeurs confirmées** par comparaison avec écran télécommande
+
+| Offset | Taille | Description | Format | Statut |
+|--------|--------|-------------|--------|--------|
+| 56 | 1 | Niveau ventil UE | entier | ✅ **VALIDÉ** (=6) |
+| 62-63 | 2 | T° air repris UI | big-endian, ÷100 °C | ✅ VALIDÉ |
+| 64-65 | 2 | T° extérieure | big-endian, ÷100 °C | ✅ VALIDÉ |
+| 66-67 | 2 | T° échangeur 1 | big-endian, ÷100 °C | ✅ VALIDÉ |
+| 68-69 | 2 | T° échangeur 2 | big-endian, ÷100 °C | ✅ VALIDÉ |
+| 72-73 | 2 | T° ? | big-endian, ÷100 °C | ❓ À confirmer |
+| **84-85** | 2 | **Courant compresseur** | big-endian, ÷100 A | ✅ **VALIDÉ** |
+| **90-91** | 2 | **Heures ventilateur** | big-endian, heures | ✅ **VALIDÉ** |
+| **94-95** | 2 | **Heures compresseur** | big-endian, heures | ✅ **VALIDÉ** |
+
+### Validation courant compresseur (offsets 84-85)
+
+| Capture | Écran télécommande | Hex trame | Valeur calculée | Match |
+|---------|-------------------|-----------|-----------------|-------|
+| #1 | **3.5 A** | 0x0164 | 356 ÷ 100 = 3.56 A | ✅ |
+| #2 | **4.1 A** | 0x019A | 410 ÷ 100 = 4.10 A | ✅ |
+
+### Validation heures (offsets 90-95)
+
+| Paramètre | Dashboard | Hex trame | Valeur | Match |
+|-----------|-----------|-----------|--------|-------|
+| Heures ventilateur | ~25500 h | 0x639C | 25500 | ✅ |
+| Heures compresseur | 12700 h | 0x319C | 12700 | ✅ |
+
+### Importance de cette découverte
+
+Le **courant compresseur** n'est disponible **nulle part ailleurs** :
+- ❌ USB Modbus (R49 = valeur incorrecte)
+- ❌ Réponse `01 17 80 xx`
+- ✅ **Uniquement dans la trame `21 xx`**
+
+> **Note** : Cette trame nécessite une analyse plus approfondie pour identifier tous les champs. La T° sortie compresseur (~70°C) reste à localiser.
+
+### Bytes à investiguer
+
+| Offset | Hypothèse | Test suggéré |
+|--------|-----------|--------------|
+| 70-73 | T° sortie compresseur ? | Chercher valeur ~7000 (70°C) |
+| 58-61 | Fréquences ? | Comparer avec R60/R65 |
+| 76-83 | EEV / Pressions ? | Comparer avec R64/R104-R105 |
+
+---
+
+## 10. Avertissements
 
 **Utilisation à vos risques**
 
@@ -489,7 +555,7 @@ L'ESP32 et la télécommande Aldes ne peuvent pas coexister sur le même bus RS4
 
 ---
 
-## 10. Ressources
+## 11. Ressources
 
 | Ressource | Lien |
 |-----------|------|

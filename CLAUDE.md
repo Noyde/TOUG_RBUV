@@ -54,6 +54,14 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - Le protocole 0x17 sert **uniquement** à changer le MODE (On/Off, Chauffage/Clim, Eco/Boost, Vacances)
 - **Validé 2025-01-13** : Test sans télécommande ni trames 0x17 → bouches réagissent aux thermostats
 
+### Trame `21 xx` - Communication interne PAC - DÉCOUVERTE 2025-01-20
+- Trame différente de `01 17`, communication interne PAC
+- **Courant compresseur** à offset 84-85 (÷100 pour Ampères) - **SEULE SOURCE !**
+- Heures ventilateur à offset 90-91, Heures compresseur à offset 94-95
+- Températures internes (air repris, échangeurs) aux offsets 62-69
+- Niveau ventil UE à offset 56
+- ⚠️ T° sortie compresseur (~70°C) à localiser dans cette trame
+
 ### Mapping registres différent (RBUV sans ECS)
 | Registre | TOUG (avec ECS) | RBUV (sans ECS) |
 |----------|-----------------|-----------------|
@@ -102,6 +110,8 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
 - ✅ Composant ESPHome mis à jour avec offsets corrigés (2025-01-13)
 - ✅ **État bouches découvert** : byte 33 réponse 0x17 = bitmap (2025-01-15)
+- ✅ **Trame `21 xx` découverte** : courant compresseur, heures, T° internes (2025-01-20)
+- ⚠️ T° sortie compresseur à localiser dans trame `21 xx`
 - ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
 - ⚠️ Projet BETA - utilisation à vos risques
 
