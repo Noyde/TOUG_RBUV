@@ -25,7 +25,21 @@ BAUDRATE = 19200
 PARITY = 'E'
 
 # Registres a scanner sur Pi Zero
-DEFAULT_REGISTERS = [77, 78, 79, 80, 5029, 5030, 5031]
+# Plages candidates pour le bitmap des bouches
+DEFAULT_REGISTERS = [
+    # Registres proches de R77
+    77, 78, 79, 80, 81, 82, 83, 84, 85,
+    # Zone 70-76
+    70, 71, 72, 73, 74, 75, 76,
+    # Registres TOUG
+    5029, 5030, 5031, 5032,
+    # Autres candidats
+    51, 52, 53, 54, 55,
+    90, 91, 92, 93,
+    100, 101, 102, 103,
+    # Plage 30000 (TOUG)
+    30026, 30027, 30028,
+]
 
 # Mapping bouches
 BOUCHES = {
