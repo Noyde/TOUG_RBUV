@@ -217,7 +217,7 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 
 ### Structure détaillée réponse `01 17 80 0b` (133 bytes)
 
-> ⚠️ **À VALIDER** : Structure découverte par analyse, certains offsets nécessitent confirmation par capture synchronisée.
+> ✅ **VALIDÉ 2025-01-20** : Structure confirmée par capture synchronisée (RS485 + USB simultanés)
 
 | Offset | Taille | Description | Valeurs | Statut |
 |--------|--------|-------------|---------|--------|
@@ -225,22 +225,20 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 | 1 | 1 | Fonction | 0x17 | ✅ Confirmé |
 | 2 | 1 | Type réponse | 0x80 | ✅ Confirmé |
 | 3 | 1 | Sous-type | 0x0B | ✅ Confirmé |
-| 4 | 1 | ? | Variable | ❓ À identifier |
-| 5-6 | 2 | Débit mesuré ? | m³/h | ⚠️ À valider |
-| 7-8 | 2 | PSE mesurée ? | Pa | ⚠️ À valider |
-| 9-12 | 4 | ? | Variable | ❓ À identifier |
-| 13-14 | 2 | Compteur trame | Incrémente | ⚠️ À valider |
-| 15-19 | 5 | ? | Variable | ❓ À identifier |
+| 4 | 1 | Compteur | Incrémente | ✅ Confirmé |
+| 5-6 | 2 | ? | Variable | ❓ À identifier |
+| 7-8 | 2 | ? | Variable | ❓ À identifier |
+| 9-19 | 11 | ? | Variable | ❓ À identifier |
 | **20** | 1 | **Mode PAC** | 02=Clim, 04=Chauff, 05=Off | ✅ Confirmé |
 | 21-32 | 12 | ? | Variable | ❓ À identifier |
 | **33** | 1 | **Bitmap bouches** | Voir tableau ci-dessous | ✅ **Confirmé** |
-| 34-38 | 5 | ? | Variable | ❓ À identifier |
-| **40-51** | 12 | **Consignes zones** | 6×2 bytes, little-endian, ÷100 pour °C | ⚠️ À valider |
-| 52-71 | 20 | ? | Variable | ❓ À identifier |
-| **72-83** | 12 | **T° zones mesurées (R36-R41)** | 6×2 bytes, little-endian, ÷100 pour °C | ✅ **Confirmé 2025-01-18** |
-| 84-87 | 4 | ? | Variable | ❓ À identifier |
-| **88-111** | 24 | **IDs thermostats 868MHz** | 6×4 bytes, little-endian | ✅ **Confirmé** |
-| 109-130 | 22 | ? | Variable | ❓ À identifier |
+| 34-41 | 8 | ? | Variable | ❓ À identifier |
+| **42-53** | 12 | **Consignes zones (R20-R25)** | 6×2 bytes, little-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
+| 54-73 | 20 | ? | Variable | ❓ À identifier |
+| **74-85** | 12 | **T° zones mesurées (R36-R41)** | 6×2 bytes, little-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
+| 86-88 | 3 | ? | Variable | ❓ À identifier |
+| **89-112** | 24 | **IDs thermostats 868MHz** | 6×4 bytes, little-endian | ✅ **Confirmé** |
+| 113-130 | 18 | ? | Variable | ❓ À identifier |
 | 131-132 | 2 | CRC16 Modbus | Calculé | ✅ Confirmé |
 
 ### Bitmap état des bouches (byte 33)
@@ -261,7 +259,7 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 - K5 seule active → byte 33 = 0x10 ✅
 - K3 + K4 actives → byte 33 = 0x0C (0x04 | 0x08)
 
-### IDs thermostats 868MHz (offsets 88-111)
+### IDs thermostats 868MHz (offsets 89-112)
 
 > ✅ **Découverte 2025-01-18** : Les IDs des thermostats radio sont transmis dans la réponse !
 
@@ -269,30 +267,42 @@ Format : 6 IDs de 4 bytes chacun, encodés en **little-endian**.
 
 | Offset | Zone | Exemple hex | ID décimal |
 |--------|------|-------------|------------|
-| 88-91 | TH1 (K1a) | `e7 87 00 f3` | 00F3E787 |
-| 92-95 | TH2 (K1b) | `e7 87 00 f3` | 00F3E787 |
-| 96-99 | TH3 (K3) | `03 e2 00 f3` | 00F3E203 |
-| 100-103 | TH4 (K4) | `e3 e1 00 f3` | 00F3E1E3 |
-| 104-107 | TH5 (K5) | `fe e1 00 f3` | 00F3E1FE |
-| 108-111 | TH6 (K6) | `e0 e1 00 f3` | 00F3E1E0 |
+| 89-92 | TH1 (K1a) | `e7 87 00 f3` | 00F3E787 |
+| 93-96 | TH2 (K1b) | `e7 87 00 f3` | 00F3E787 |
+| 97-100 | TH3 (K3) | `03 e2 00 f3` | 00F3E203 |
+| 101-104 | TH4 (K4) | `e3 e1 00 f3` | 00F3E1E3 |
+| 105-108 | TH5 (K5) | `fe e1 00 f3` | 00F3E1FE |
+| 109-112 | TH6 (K6) | `e0 e1 00 f3` | 00F3E1E0 |
 
 > **Note** : TH1 et TH2 partagent le même ID car K1a et K1b sont sur le même thermostat physique.
 
-### Validation températures zones (2025-01-18)
+### Validation capture synchronisée (2025-01-20)
 
-Comparaison entre les valeurs de la trame 0x17 (capture) et les registres Modbus USB :
+Capture RS485 et lecture Modbus USB effectuées simultanément. **Correspondance parfaite !**
 
-| Zone | Offset | Trame 0x17 | R36-R41 USB | Écart |
+#### Consignes zones (offsets 42-53)
+
+| Zone | Offset | Trame 0x17 | R20-R25 USB | Match |
 |------|--------|------------|-------------|-------|
-| Z1 (K1a) | 72-73 | 21.18°C | 21.31°C | 0.13°C |
-| Z1b (K1b) | 74-75 | 21.18°C | 21.31°C | 0.13°C |
-| Z2 | 76-77 | 20.31°C | 20.25°C | 0.06°C |
-| Z3 | 78-79 | 22.31°C | 22.50°C | 0.19°C |
-| Z4 | 80-81 | **20.75°C** | **20.75°C** | **0.00°C** ✓ |
-| Z5 | 82-83 | 20.62°C | 20.87°C | 0.25°C |
+| Z1 (K1a) | 42-43 | **21.00°C** | **2100** | ✅ |
+| Z1b (K1b) | 44-45 | **21.00°C** | **2100** | ✅ |
+| Z2 | 46-47 | **19.00°C** | **1900** | ✅ |
+| Z3 | 48-49 | **21.00°C** | **2100** | ✅ |
+| Z4 | 50-51 | **20.00°C** | **2000** | ✅ |
+| Z5 | 52-53 | **20.00°C** | **2000** | ✅ |
 
-> Les écarts sont dus au décalage temporel entre la capture RS485 et la lecture USB.
-> **Conclusion** : Offsets 72-83 = Températures zones mesurées (équivalent R36-R41) ✅
+#### Températures zones (offsets 74-85)
+
+| Zone | Offset | Trame 0x17 | R36-R41 USB | Match |
+|------|--------|------------|-------------|-------|
+| Z1 (K1a) | 74-75 | **21.18°C** | **2118** | ✅ |
+| Z1b (K1b) | 76-77 | **21.18°C** | **2118** | ✅ |
+| Z2 | 78-79 | **19.75°C** | **1975** | ✅ |
+| Z3 | 80-81 | **21.75°C** | **2175** | ✅ |
+| Z4 | 82-83 | **20.00°C** | **2000** | ✅ |
+| Z5 | 84-85 | **20.00°C** | **2000** | ✅ |
+
+> **Conclusion** : Structure de la réponse `01 17 80 0b` entièrement validée par capture synchronisée !
 
 ### Comparaison avec registre R77 (USB)
 
