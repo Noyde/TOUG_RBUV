@@ -525,7 +525,23 @@ Le **courant compresseur** n'est disponible **nulle part ailleurs** :
 - ❌ Réponse `01 17 80 xx`
 - ✅ **Uniquement dans la trame `21 xx`**
 
-> **Note** : Cette trame nécessite une analyse plus approfondie pour identifier tous les champs. La T° sortie compresseur (~70°C) reste à localiser.
+---
+
+## Résumé : Valeurs UNIQUES au RS485 (non dispo USB)
+
+> ⚠️ **Ces 3 valeurs justifient l'utilisation du bus RS485 plutôt que USB !**
+
+| Valeur | USB Modbus | RS485 | Réponse/Trame |
+|--------|------------|-------|---------------|
+| **Bitmap bouches actives** | ❌ R77=index, R5029=0 | ✅ Byte 33 | `01 17 80 0b` |
+| **Courant compresseur** | ❌ R49=243 (faux) | ✅ Offset 84-85 | Trame `21 xx` |
+| **IDs thermostats 868MHz** | ❌ Non disponible | ✅ Offsets 89-112 | `01 17 80 0b` |
+
+### Bitmap bouches (byte 33 réponse `80 0b`)
+```
+K1a=0x01, K1b=0x02, K3=0x04, K4=0x08, K5=0x10, K6=0x20
+```
+Exemple : K1a + K4 actives → byte 33 = 0x09 (0x01 | 0x08)
 
 ### Bytes à investiguer
 
