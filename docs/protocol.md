@@ -233,9 +233,9 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 | 21-32 | 12 | ? | Variable | ❓ À identifier |
 | **33** | 1 | **Bitmap bouches** | Voir tableau ci-dessous | ✅ **Confirmé** |
 | 34-41 | 8 | ? | Variable | ❓ À identifier |
-| **42-53** | 12 | **Consignes zones (R20-R25)** | 6×2 bytes, little-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
+| **42-53** | 12 | **Consignes zones (R20-R25)** | 6×2 bytes, big-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
 | 54-73 | 20 | ? | Variable | ❓ À identifier |
-| **74-85** | 12 | **T° zones mesurées (R36-R41)** | 6×2 bytes, little-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
+| **74-85** | 12 | **T° zones mesurées (R36-R41)** | 6×2 bytes, big-endian, ÷100 pour °C | ✅ **VALIDÉ 2025-01-20** |
 | 86-88 | 3 | ? | Variable | ❓ À identifier |
 | **89-112** | 24 | **IDs thermostats 868MHz** | 6×4 bytes, little-endian | ✅ **Confirmé** |
 | 113-130 | 18 | ? | Variable | ❓ À identifier |
@@ -255,6 +255,7 @@ La PAC répond aux trames 0x17 avec une réponse de 133 bytes contenant des info
 | 5 | K6 | 0x20 | 6 |
 
 **Exemples validés :**
+- K1a + K1b actives → byte 33 = 0x03 (0x01 | 0x02) ✅
 - K4 seule active → byte 33 = 0x08 ✅
 - K5 seule active → byte 33 = 0x10 ✅
 - K3 + K4 actives → byte 33 = 0x0C (0x04 | 0x08)

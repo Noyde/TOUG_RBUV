@@ -39,13 +39,13 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 ### Consignes zones dans réponse 0x17 - VALIDÉ 2025-01-20
 - Offsets 42-53 de la réponse `01 17 80 0b` = consignes thermostats (6×2 bytes)
 - Équivalent aux registres R20-R25 via USB
-- Format : little-endian, ÷100 pour °C
+- Format : big-endian, ÷100 pour °C
 - Validation : Correspondance parfaite sur capture synchronisée
 
 ### Températures zones dans réponse 0x17 - VALIDÉ 2025-01-20
 - Offsets 74-85 de la réponse `01 17 80 0b` = températures mesurées (6×2 bytes)
 - Équivalent aux registres R36-R41 via USB
-- Format : little-endian, ÷100 pour °C
+- Format : big-endian, ÷100 pour °C
 - Validation : Correspondance parfaite sur capture synchronisée
 
 ### Régulation zones INDÉPENDANTE du protocole 0x17
