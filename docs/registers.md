@@ -89,12 +89,16 @@ Documentation des 40 registres Modbus accessibles en lecture via USB.
 
 | Registre | Nom | Unité | Diviseur | Notes |
 |----------|-----|-------|----------|-------|
-| 49 | Courant Compresseur | A | ÷100 | |
+| 49 | R49 (inconnu) | - | 1 | ⚠️ **PAS le courant** - valeur incorrecte (243) |
 | 65 | Consigne Fréquence | Hz | ÷10 | |
 | 66 | Fréquence Compresseur | Hz | ÷10 | |
 | 72 | Temps ON Compresseur (bas) | s | 1 | 32-bit (poids faible) |
 | 73 | Temps ON Compresseur (haut) | - | 1 | 32-bit (poids fort) |
 | 127 | Heures Compresseur | h | 1 | Compteur total |
+
+> ⚠️ **Courant Compresseur** : NON disponible via USB Modbus sur RBUV ! R49 retourne une valeur incorrecte.
+> La seule source fiable est la **trame `21 xx`** sur RS485 (offset 84-85, ÷100 pour Ampères).
+> Voir `docs/protocol.md` section 9.
 
 ---
 

@@ -150,7 +150,8 @@ def build_registers():
         "temp_zone5": {"address": 41, "name": f"Température {ZONES['zone5']}", "unit": "°C", "divisor": 100, "device_class": "temperature", "icon": "mdi:thermometer", "signed": True},
 
         # COMPRESSEUR (6 registres)
-        "courant_compresseur": {"address": 49, "name": "Courant Compresseur", "unit": "A", "divisor": 100, "device_class": "current", "icon": "mdi:current-ac"},
+        # NOTE: R49 n'est PAS le courant compresseur (validé 2025-01-20, valeur ne correspond pas à la télécommande)
+        "r49_inconnu": {"address": 49, "name": "R49 (inconnu)", "unit": "", "divisor": 1, "device_class": None, "icon": "mdi:help-circle"},
         "consigne_freq": {"address": 65, "name": "Consigne Fréquence", "unit": "Hz", "divisor": 10, "device_class": "frequency", "icon": "mdi:sine-wave"},
         "freq_compresseur": {"address": 66, "name": "Fréquence Compresseur", "unit": "Hz", "divisor": 10, "device_class": "frequency", "icon": "mdi:sine-wave"},
         "temps_on_compresseur_bas": {"address": 72, "name": "Temps ON Compresseur (bas)", "unit": "s", "divisor": 1, "device_class": None, "icon": "mdi:timer"},
@@ -307,8 +308,8 @@ def print_status(values):
         logging.info(f"  Mode PAC: {mode}")
     if values.get("duree_on") is not None:
         logging.info(f"  Durée ON: {int(values['duree_on'])} min")
-    if values.get("protection_compresseur") is not None:
-        logging.info(f"  Protection Compresseur: {int(values['protection_compresseur'])}")
+    if values.get("r51_inconnu") is not None:
+        logging.info(f"  R51 (inconnu): {int(values['r51_inconnu'])}")
 
     # CONSIGNES
     logging.info("═══ CONSIGNES ═══")
@@ -337,8 +338,8 @@ def print_status(values):
         logging.info(f"  Fréquence: {values['freq_compresseur']:.1f} Hz")
     if values.get("consigne_freq") is not None:
         logging.info(f"  Consigne Fréquence: {values['consigne_freq']:.1f} Hz")
-    if values.get("courant_compresseur") is not None:
-        logging.info(f"  Courant: {values['courant_compresseur']:.2f} A")
+    if values.get("r49_inconnu") is not None:
+        logging.info(f"  R49 (inconnu): {int(values['r49_inconnu'])}")
     if values.get("heures_compresseur") is not None:
         logging.info(f"  Heures: {int(values['heures_compresseur'])} h")
 

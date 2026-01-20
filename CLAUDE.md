@@ -30,18 +30,37 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - R77 via USB donne uniquement l'index de la dernière zone (pas un bitmap)
 - **Pas besoin d'optocouplers** pour lire l'état des bouches sur RBUV
 
-### IDs thermostats 868MHz dans réponse 0x17 - DÉCOUVERT 2025-01-18
-- Offsets 85-108 de la réponse `01 17 80 0b` contiennent les 6 IDs thermostats
+### IDs thermostats 868MHz dans réponse 0x17 - CONFIRMÉ 2025-01-20
+- Offsets 89-112 de la réponse `01 17 80 0b` contiennent les 6 IDs thermostats
 - Format : 4 bytes par ID, encodage **little-endian**
 - Exemple : `e7 87 00 f3` → ID 00F3E787
 - TH1 et TH2 partagent le même ID (K1a et K1b sur même thermostat physique)
-- ⚠️ Structure complète réponse à valider par capture synchronisée
+
+### Consignes zones dans réponse 0x17 - VALIDÉ 2025-01-20
+- Offsets 42-53 de la réponse `01 17 80 0b` = consignes thermostats (6×2 bytes)
+- Équivalent aux registres R20-R25 via USB
+- Format : big-endian, ÷100 pour °C
+- Validation : Correspondance parfaite sur capture synchronisée
+
+### Températures zones dans réponse 0x17 - VALIDÉ 2025-01-20
+- Offsets 74-85 de la réponse `01 17 80 0b` = températures mesurées (6×2 bytes)
+- Équivalent aux registres R36-R41 via USB
+- Format : big-endian, ÷100 pour °C
+- Validation : Correspondance parfaite sur capture synchronisée
 
 ### Régulation zones INDÉPENDANTE du protocole 0x17
 - Les thermostats 868MHz communiquent **directement** avec le régulateur PAC
 - Les bouches motorisées s'ouvrent/ferment **sans avoir besoin** de trames 0x17
 - Le protocole 0x17 sert **uniquement** à changer le MODE (On/Off, Chauffage/Clim, Eco/Boost, Vacances)
 - **Validé 2025-01-13** : Test sans télécommande ni trames 0x17 → bouches réagissent aux thermostats
+
+### Trame `21 xx` - Communication interne PAC - DÉCOUVERTE 2025-01-20
+- Trame différente de `01 17`, communication interne PAC
+- **Courant compresseur** à offset 84-85 (÷100 pour Ampères) - **SEULE SOURCE !**
+- Heures ventilateur à offset 90-91, Heures compresseur à offset 94-95
+- Températures internes (air repris, échangeurs) aux offsets 62-69
+- Niveau ventil UE à offset 56
+- ⚠️ T° sortie compresseur (~70°C) à localiser dans cette trame
 
 ### Mapping registres différent (RBUV sans ECS)
 | Registre | TOUG (avec ECS) | RBUV (sans ECS) |
@@ -91,6 +110,8 @@ C'est un complément au projet [TOUG](https://github.com/djtef/toug) de @djtef, 
 - ✅ Tests envoi Y01-Y07 validés via Pi 2B RS485 (2025-01-13)
 - ✅ Composant ESPHome mis à jour avec offsets corrigés (2025-01-13)
 - ✅ **État bouches découvert** : byte 33 réponse 0x17 = bitmap (2025-01-15)
+- ✅ **Trame `21 xx` découverte** : courant compresseur, heures, T° internes (2025-01-20)
+- ⚠️ T° sortie compresseur à localiser dans trame `21 xx`
 - ⚠️ Tests envoi ESP32 à faire (même protocole, validation finale)
 - ⚠️ Projet BETA - utilisation à vos risques
 
