@@ -475,10 +475,10 @@ xxxx                                      # CRC16
 
 > ⚠️ **DÉCOUVERTE** : Une trame différente de `01 17` a été identifiée sur le bus RS485 !
 
-Cette trame semble être une communication interne de la PAC (pas initiée par la télécommande). Elle contient des données **non disponibles** dans les réponses `01 17` standard, notamment :
-- **Courant compresseur** (introuvable via USB et 01 17)
-- **Heures compresseur et ventilateur**
-- **Températures internes**
+Cette trame semble être une communication interne de la PAC (pas initiée par la télécommande). Elle contient :
+- **Courant compresseur** - ⚠️ **SEULE SOURCE FIABLE** (R49 USB = valeur incorrecte)
+- Heures compresseur/ventilateur (aussi dispo via R125/R127 USB)
+- Températures internes (aussi dispo via R111-R117 USB)
 
 ### Caractéristiques
 
@@ -492,17 +492,17 @@ Cette trame semble être une communication interne de la PAC (pas initiée par l
 
 > ✅ **Valeurs confirmées** par comparaison avec écran télécommande
 
-| Offset | Taille | Description | Format | Statut |
-|--------|--------|-------------|--------|--------|
-| 56 | 1 | Niveau ventil UE | entier | ✅ **VALIDÉ** (=6) |
-| 62-63 | 2 | T° air repris UI | big-endian, ÷100 °C | ✅ VALIDÉ |
-| 64-65 | 2 | T° extérieure | big-endian, ÷100 °C | ✅ VALIDÉ |
-| 66-67 | 2 | T° échangeur 1 | big-endian, ÷100 °C | ✅ VALIDÉ |
-| 68-69 | 2 | T° échangeur 2 | big-endian, ÷100 °C | ✅ VALIDÉ |
-| 72-73 | 2 | T° ? | big-endian, ÷100 °C | ❓ À confirmer |
-| **84-85** | 2 | **Courant compresseur** | big-endian, ÷100 A | ✅ **VALIDÉ** |
-| **90-91** | 2 | **Heures ventilateur** | big-endian, heures | ✅ **VALIDÉ** |
-| **94-95** | 2 | **Heures compresseur** | big-endian, heures | ✅ **VALIDÉ** |
+| Offset | Taille | Description | Format | Équiv. USB | Statut |
+|--------|--------|-------------|--------|------------|--------|
+| 56 | 1 | Niveau ventil UE | entier | R106 | ✅ **VALIDÉ** |
+| 62-63 | 2 | T° air repris UI | ÷100 °C | R111 | ✅ VALIDÉ |
+| 64-65 | 2 | T° extérieure | ÷100 °C | R112 | ✅ VALIDÉ |
+| 66-67 | 2 | T° échangeur UI | ÷100 °C | R114 | ✅ VALIDÉ |
+| 68-69 | 2 | T° échangeur UE | ÷100 °C | R115 | ✅ VALIDÉ |
+| 72-73 | 2 | T° ? | ÷100 °C | ? | ❓ À confirmer |
+| **84-85** | 2 | **Courant compresseur** | ÷100 A | ❌ R49 KO | ✅ **UNIQUE** |
+| 90-91 | 2 | Heures ventilateur | heures | R125 | ✅ VALIDÉ |
+| 94-95 | 2 | Heures compresseur | heures | R127 | ✅ VALIDÉ |
 
 ### Validation courant compresseur (offsets 84-85)
 
