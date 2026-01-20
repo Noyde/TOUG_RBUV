@@ -311,15 +311,25 @@ Capture RS485 et lecture Modbus USB effectuées simultanément. **Correspondance
 
 > **Conclusion** : Structure de la réponse `01 17 80 0b` entièrement validée par capture synchronisée !
 
-### Structure réponse `01 17 80 01` (Compresseur) - VALIDÉ 2025-01-20
+### Structure réponse `01 17 80 01` (Compresseur + Système) - VALIDÉ 2025-01-20
 
-> ✅ **Découverte 2025-01-20** : La réponse `80 01` contient les données compresseur (R65, R117) !
+> ✅ **Découverte 2025-01-20** : La réponse `80 01` contient R65 (consigne fréq), R104-R112 (système), R117 (T° compresseur) !
 
 | Offset | Taille | Description | Registre | Format | Statut |
 |--------|--------|-------------|----------|--------|--------|
 | 0-3 | 4 | Header | 01 17 80 01 | - | ✅ |
 | **4-5** | 2 | **Consigne fréquence** | **R65** | little-endian, ÷10 Hz | ✅ **VALIDÉ** |
-| 6-104 | ~99 | Données diverses | ? | - | ❓ À identifier |
+| 6-81 | 76 | Données diverses | ? | - | ❓ À identifier |
+| **82-83** | 2 | **?** | **R104** | big-endian | ✅ **VALIDÉ** |
+| **84-85** | 2 | **?** | **R105** | big-endian | ✅ **VALIDÉ** |
+| **86-87** | 2 | **?** | **R106** | big-endian | ✅ **VALIDÉ** |
+| **88-89** | 2 | **?** | **R107** | big-endian | ✅ **VALIDÉ** |
+| **90-91** | 2 | **?** | **R108** | big-endian | ✅ **VALIDÉ** |
+| **92-93** | 2 | **?** | **R109** | big-endian | ✅ **VALIDÉ** |
+| **94-95** | 2 | **?** | **R110** | big-endian | ✅ **VALIDÉ** |
+| **96-97** | 2 | **Température ?** | **R111** | big-endian, ÷100 °C | ✅ **VALIDÉ** |
+| **98-99** | 2 | **T° extérieure** | **R112** | big-endian, ÷100 °C | ✅ **VALIDÉ** |
+| 100-104 | 5 | Données diverses | ? | - | ❓ À identifier |
 | **~105-106** | 2 | **T° sortie compresseur** | **R117** | big-endian, ÷100 °C | ✅ **VALIDÉ** |
 
 #### Validation capture synchronisée (2025-01-20)
@@ -328,6 +338,24 @@ Capture RS485 et lecture Modbus USB effectuées simultanément. **Correspondance
 |-----------|-------|-------------|--------|-------|
 | Consigne fréquence | R65=310 | 0x36 0x01 | 31.0 Hz | ✅ |
 | T° sortie compresseur | R117=4866 | 0x13 0x02 | 48.66°C | ✅ |
+
+#### Registres système R104-R112 (offsets 82-99) - VALIDÉ 2025-01-20
+
+| Offset | Hex exemple | Valeur | Registre | Description |
+|--------|-------------|--------|----------|-------------|
+| 82-83 | 00 bf | 191 | R104 | ? |
+| 84-85 | 00 00 | 0 | R105 | ? |
+| 86-87 | 00 05 | 5 | R106 | ? |
+| 88-89 | 00 81 | 129 | R107 | ? |
+| 90-91 | 00 20 | 32 | R108 | ? |
+| 92-93 | 00 7c | 124 | R109 | ? |
+| 94-95 | 00 ff | 255 | R110 | ? |
+| 96-97 | 08 82 | 2178 | R111 | **21.78°C = T° air repris UI** |
+| 98-99 | 03 14 | 788 | R112 | **7.88°C = T° extérieure** |
+
+> **Note** :
+> - R111 = Température air repris UI (air de retour vers l'unité intérieure)
+> - R112 = T° extérieure. Sur modèle RBUV sans ECS, ce registre contient la température extérieure (pas la sonde ECS comme sur modèles avec ballon).
 
 ### Structure réponse `01 17 78 xx` (Ventilation) - VALIDÉ 2025-01-20
 
@@ -366,6 +394,9 @@ La réponse `78 xx` contient les données de ventilation et compresseur. Taille 
 | R63 | ? | `80 0b` | 7-8, 127-128 | ✅ VALIDÉ |
 | R64 | ? | `80 0b` | 129-130 | ✅ VALIDÉ |
 | R65 | Consigne fréquence | `80 01` | 4-5 | ✅ VALIDÉ |
+| **R104-R110** | **Données système** | `80 01` | 82-95 | ✅ **VALIDÉ** |
+| **R111** | **T° air repris UI** | `80 01` | 96-97 | ✅ **VALIDÉ** |
+| **R112** | **T° extérieure** | `80 01` | 98-99 | ✅ **VALIDÉ** |
 | R117 | T° sortie compresseur | `80 01` | ~105-106 | ✅ VALIDÉ |
 | R247 | PSE Nominal | `78 xx` | ~109-110 | ✅ VALIDÉ |
 | R248 | PSE Mini | `78 xx` | ~111-112 | ✅ VALIDÉ |
@@ -373,7 +404,7 @@ La réponse `78 xx` contient les données de ventilation et compresseur. Taille 
 | R250 | Débit Nominal | `78 xx` | ~114-115 | ✅ VALIDÉ |
 | R251 | PSE Mesurée | `78 xx` | ~116-117 | ✅ VALIDÉ |
 
-> **Note** : Tous les registres compresseur/ventilation (R60-R65, R117, R247-R251) sont maintenant localisés !
+> **Note** : Tous les registres compresseur/ventilation/système (R60-R65, R104-R112, R117, R247-R251) sont maintenant localisés !
 
 ### Comparaison avec registre R77 (USB)
 
